@@ -14,7 +14,7 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
 
     private bool m_OldAutoContactCallbacks;
     private PhysicsWorld.DrawFillOptions m_OldDrawFillOptions;
-    
+
     private ControlsMenu.CustomButton m_LeftButton;
     private ControlsMenu.CustomButton m_RightButton;
     private ControlsMenu.CustomButton m_FireButton;
@@ -28,7 +28,7 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
     private Color m_DestructibleColor;
     private PhysicsShape.ContactFilter m_DestructibleContactFilter;
     private PhysicsShape.SurfaceMaterial m_DestructibleSurfaceMaterial;
-    
+
     private const float ProjectileRadius = 0.2f;
     private const float PlayerSpeed = 60f;
     private const float ProjectileSpeed = 40f;
@@ -45,7 +45,7 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
         Group,
         Individual
     };
-    
+
     private float m_FragmentRadius;
     private int m_FragmentCount;
     private FragmentColors m_FragmentColors;
@@ -62,9 +62,9 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
         m_CameraManipulator.CameraSize = 28f;
         m_CameraManipulator.CameraPosition = new Vector2(0f, 14f);
 
-        // Get the default world.        
+        // Get the default world.
         var world = PhysicsWorld.defaultWorld;
-        
+
         // Turn-on auto contact callbacks.
         m_OldAutoContactCallbacks = world.autoContactCallbacks;
         world.autoContactCallbacks = true;
@@ -72,41 +72,41 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
         // Turn on interior drawing only.
         m_OldDrawFillOptions = world.drawFillOptions;
         world.drawFillOptions = PhysicsWorld.DrawFillOptions.Interior;
-        
+
         // Set controls.
         {
             m_LeftButton = m_SandboxManager.ControlsMenu[2];
             m_RightButton = m_SandboxManager.ControlsMenu[1];
             m_FireButton = m_SandboxManager.ControlsMenu[0];
-            
+
             m_LeftButton.Set("Left");
             m_RightButton.Set("Right");
             m_FireButton.Set("Fire");
             m_FireButton.button.clickable.clicked += FirePressed;
         }
-        
+
         // Set up the scene reset action.
         m_SandboxManager.SceneResetAction = SetupScene;
 
         // Set Overrides.
         m_SandboxManager.SetOverrideColorShapeState(false);
-        
+
         m_DestructibleColor = Color.seaGreen;
         m_DestructibleContactFilter = new PhysicsShape.ContactFilter { categories = m_DestructibleMask, contacts = m_ProjectileMask | m_DebrisMask };
         m_DestructibleSurfaceMaterial = new PhysicsShape.SurfaceMaterial { friction = 0f, bounciness = 0.4f, tangentSpeed = 0.1f, customColor = m_DestructibleColor };
-        
+
         m_PlayerGeometry = new CapsuleGeometry { center1 = Vector2.zero, center2 = Vector2.up, radius = 0.5f };
         m_DestructGeometry = PolygonGeometry.CreateBox(new Vector2(50f, 20f));
-        
+
         m_PlayerPosition = new Vector2(0f, -8f);
-        
+
         m_FragmentRadius = 1.5f;
         m_FragmentCount = 25;
         m_FragmentColors = FragmentColors.Group;
         m_FragmentExplode = false;
-        
+
         UpdateFragmentGeometry();
-        
+
         SetupOptions();
 
         SetupScene();
@@ -115,17 +115,17 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
     private void OnDisable()
     {
         // Reset overrides.
-        m_SandboxManager.ResetOverrideColorShapeState();        
+        m_SandboxManager.ResetOverrideColorShapeState();
 
         // Get the default world.
         var world = PhysicsWorld.defaultWorld;
-        
+
         // Reset the callbacks.
         world.autoContactCallbacks = m_OldAutoContactCallbacks;
-        
+
         // Reset the draw fill options.
         world.drawFillOptions = m_OldDrawFillOptions;
-        
+
         // Unregister.
         m_FireButton.button.clickable.clicked -= FirePressed;
 
@@ -143,7 +143,7 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
             var menuRegion = root.Q<VisualElement>("menu-region");
             menuRegion.RegisterCallback<PointerEnterEvent>(_ => ++m_CameraManipulator.OverlapUI);
             menuRegion.RegisterCallback<PointerLeaveEvent>(_ => --m_CameraManipulator.OverlapUI);
-            
+
             // Fragment Radius.
             var fireRadius = root.Q<Slider>("fragment-radius");
             fireRadius.value = m_FragmentRadius;
@@ -157,7 +157,7 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
             var fragmentCount = root.Q<SliderInt>("fragment-count");
             fragmentCount.value = m_FragmentCount;
             fragmentCount.RegisterValueChangedCallback(evt => { m_FragmentCount = evt.newValue; });
-            
+
             // Fragment Colors.
             var fragmentColors = root.Q<EnumField>("fragment-colors");
             fragmentColors.value = m_FragmentColors;
@@ -167,7 +167,7 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
             var fragmentExplode = root.Q<Toggle>("fragment-explode");
             fragmentExplode.value = m_FragmentExplode;
             fragmentExplode.RegisterValueChangedCallback(evt => m_FragmentExplode = evt.newValue);
-            
+
             // Fetch the scene description.
             var sceneDescription = root.Q<Label>("scene-description");
             sceneDescription.text = $"\"{m_SceneManifest.LoadedSceneName}\"\n{m_SceneManifest.LoadedSceneDescription}";
@@ -192,7 +192,7 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
             groundBody.CreateShape(PolygonGeometry.CreateBox(new Vector2(500f, 50f), radius: 0f, new PhysicsTransform(Vector2.down * 40f)), shapeDef);
             groundBody.CreateShape(PolygonGeometry.CreateBox(new Vector2(500f, 50f), radius: 0f, new PhysicsTransform(Vector2.up * 68f)), shapeDef);
         }
-        
+
         // Obstacles.
         {
             var body = world.CreateBody(new PhysicsBodyDefinition { position = new Vector2(-23f, 1f) });
@@ -216,7 +216,7 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
                 body.CreateShape(new CircleGeometry { center = new Vector2(n * 8f, 16f), radius = radius }, shapeDef);
             }
         }
-        
+
         // Destructible Geometry.
         {
             var body = world.CreateBody(new PhysicsBodyDefinition { position = Vector2.up * 30f });
@@ -228,12 +228,12 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
             body.CreateShape(m_DestructGeometry, shapeDef);
         }
     }
-    
+
     private void Update()
     {
         // Get the default world.
         var world = PhysicsWorld.defaultWorld;
-        
+
         // Only allow player movement/fire if the world is not paused.
         if (!m_SandboxManager.WorldPaused)
         {
@@ -271,7 +271,7 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
         // Finish if the world is paused.
         if (m_SandboxManager.WorldPaused)
             return;
-    
+
         // Get the default world.
         var world = PhysicsWorld.defaultWorld;
 
@@ -285,7 +285,7 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
         };
         var body = world.CreateBody(bodyDef);
         body.callbackTarget = this;
-        
+
         var shapeDef = new PhysicsShapeDefinition
         {
             contactFilter = new PhysicsShape.ContactFilter { categories = m_ProjectileMask, contacts = m_DestructibleMask | m_GroundMask },
@@ -295,7 +295,7 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
         var shape = body.CreateShape(new CircleGeometry { radius = ProjectileRadius }, shapeDef);
         shape.callbackTarget = this;
     }
-    
+
     private void UpdateFragmentGeometry()
     {
         // Create the fragment geometry mask using the composer.
@@ -305,27 +305,27 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
             // Dispose of any existing fire geometry mask.
             if (m_FragmentGeometryMask.IsCreated)
                 m_FragmentGeometryMask.Dispose();
-            
+
             var composer = PhysicsComposer.Create();
             composer.AddLayer(m_FireGeometry, PhysicsTransform.identity);
             m_FragmentGeometryMask = composer.CreatePolygonGeometry(vertexScale: Vector2.one, Allocator.Persistent);
             composer.Destroy();
         }
     }
-    
+
     public void OnContactBegin2D(PhysicsEvents.ContactBeginEvent beginEvent)
     {
         var shapeA = beginEvent.shapeA;
         var shapeB = beginEvent.shapeB;
-        
+
         // Finish if either shape is invalid.
         // NOTE: We might've destroyed one in a previous callback.
         if (!shapeA.isValid || !shapeB.isValid)
             return;
-        
+
         var categoryA = shapeA.contactFilter.categories;
         var categoryB = shapeB.contactFilter.categories;
-        
+
         // Did we hit the ground?
         if (categoryA == m_GroundMask || categoryB == m_GroundMask)
         {
@@ -334,7 +334,7 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
             destroyShape.body.Destroy();
             return;
         }
-        
+
         // Did we hit a destructable?
         if (categoryA == m_DestructibleMask || categoryB == m_DestructibleMask)
         {
@@ -346,20 +346,20 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
             // Fetch the contact.
             var contact = beginEvent.contactId.contact;
             var hitPosition = contact.manifold.points[0].point;
-            
+
             // Get the default world.
             var world = PhysicsWorld.defaultWorld;
 
-            // Draw the fragment radius.            
+            // Draw the fragment radius.
             world.DrawCircle(hitPosition, m_FragmentRadius, Color.ivory, 2f / 60f, PhysicsWorld.DrawFillOptions.Outline);
-            
+
             // Fetch the destructible shapes.
             var destructibleShape = categoryA == m_DestructibleMask ? shapeA : shapeB;
             var destructibleBody = destructibleShape.body;
             using var destructibleShapes = destructibleBody.GetShapes();
-            
+
             // Get the polygon geometry from the shapes.
-            // NOTE: We know it's always polygon geometry so we don't have to convert it. 
+            // NOTE: We know it's always polygon geometry so we don't have to convert it.
             var targetPolygons = new NativeList<PolygonGeometry>(initialCapacity: destructibleShapes.Length, Allocator.Temp);
             foreach (var shape in destructibleShapes)
             {
@@ -367,10 +367,10 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
                     targetPolygons.Add(shape.polygonGeometry);
             }
 
-            // Create the target fragment geometry. 
+            // Create the target fragment geometry.
             var targetGeometry = new PhysicsDestructor.FragmentGeometry(destructibleBody.transform, targetPolygons.AsReadOnly());
             targetPolygons.Dispose();
-            
+
             // Create the fragment points.
             ref var random = ref m_SandboxManager.Random;
             var fragmentPoints = new NativeArray<Vector2>(m_FragmentCount, Allocator.Temp);
@@ -381,7 +381,7 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
                 var radius = random.NextFloat(0.05f, m_FragmentRadius);
                 fragmentPoints[i] = hitPosition + rotate.direction * radius;
             }
-            
+
             // Fragment the target geometry with the mask and fragment the results with the fragment points.
             // NOTE: This is the most complex operation, you don't have to mask the target geometry.
             var maskGeometry = new PhysicsDestructor.FragmentGeometry(hitPosition, m_FragmentGeometryMask);
@@ -389,13 +389,13 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
 
             // Dispose of the fragment points.
             fragmentPoints.Dispose();
-            
+
             // Destroy both the destructible and the projectile.
             shapeA.body.Destroy();
             shapeB.body.Destroy();
 
             var fragmentTransform = fragmentResults.transform;
-            
+
             // Create the remaining destructible geometry from the "unbroken" geometry (if we have any).
             if (fragmentResults.unbrokenGeometry.Length > 0)
             {
@@ -409,11 +409,11 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
                 foreach (var geometry in fragmentResults.unbrokenGeometry)
                     body.CreateShape(geometry, shapeDef);
             }
-            
+
             // Create the debris destructible geometry from the "broken" geometry (if we have any).
             {
                 var brokenCount = fragmentResults.brokenGeometry.Length;
-                
+
                 // Create a batch of bodies.
                 var bodyDef = new PhysicsBodyDefinition
                 {
@@ -431,14 +431,14 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
                     FragmentColors.Group => m_SandboxManager.ShapeColorState,
                     _ => throw new ArgumentOutOfRangeException()
                 };
-                
+
                 var shapeDef = new PhysicsShapeDefinition
                 {
                     contactFilter = new PhysicsShape.ContactFilter { categories = m_DebrisMask, contacts = m_GroundMask | m_DestructibleMask | m_ObstacleMask },
                     contactEvents = true,
                     surfaceMaterial = new PhysicsShape.SurfaceMaterial { customColor = shapeColor }
                 };
-                
+
                 // Add a shape for each body.
                 for (var i = 0; i < brokenCount; ++i)
                 {
@@ -447,7 +447,7 @@ public class Fragmenting : MonoBehaviour, PhysicsCallbacks.IContactCallback
 
                     if (m_FragmentColors == FragmentColors.Individual)
                         shapeDef.surfaceMaterial = new PhysicsShape.SurfaceMaterial { customColor = m_SandboxManager.ShapeColorState };
-                    
+
                     var shape = body.CreateShape(geometry, shapeDef);
                     shape.callbackTarget = this;
                 }

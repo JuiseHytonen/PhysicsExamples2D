@@ -1,16 +1,21 @@
 using Unity.Collections;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.LowLevelPhysics2D;
 using UnityEngine.UIElements;
 
-public class LargePyramid : MonoBehaviour
+public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 {
+    private readonly PhysicsMask m_GroundMask = new(1);
+    private readonly PhysicsMask m_DestructibleMask = new(2);
+    private readonly PhysicsMask m_ProjectileMask = new(3);
+
+
     private SandboxManager m_SandboxManager;
     private SceneManifest m_SceneManifest;
     private UIDocument m_UIDocument;
     private CameraManipulator m_CameraManipulator;
+    private PhysicsShape.ContactFilter m_DestructibleContactFilter;
 
     private int m_BaseCount;
     private Vector2 m_OldGravity;
@@ -33,6 +38,8 @@ public class LargePyramid : MonoBehaviour
         m_BaseCount = 90;
         m_OldGravity = PhysicsWorld.defaultWorld.gravity;
         m_GravityScale = 2f;
+        var world = PhysicsWorld.defaultWorld;
+        world.autoContactCallbacks = true;
 
         SetupOptions();
 
@@ -45,6 +52,17 @@ public class LargePyramid : MonoBehaviour
         {
             Shoot();
         }
+    }
+
+    public void OnContactBegin2D(PhysicsEvents.ContactBeginEvent beginEvent)
+    {
+        Debug.Log("CONTANT");
+    }
+
+
+    public void OnContactEnd2D(PhysicsEvents.ContactEndEvent endEvent)
+    {
+
     }
 
     private void Shoot()
@@ -61,7 +79,12 @@ public class LargePyramid : MonoBehaviour
             };
 
             var bodyDef = new PhysicsBodyDefinition { bodyType = RigidbodyType2D.Dynamic, gravityScale = m_GravityScale, fastCollisionsAllowed = true };
-            var shapeDef = new PhysicsShapeDefinition { contactFilter = PhysicsShape.ContactFilter.defaultFilter, surfaceMaterial = new PhysicsShape.SurfaceMaterial { friction = 0.0f, bounciness = 0.3f } };
+            var shapeDef = new PhysicsShapeDefinition
+            {
+                //contactFilter = new PhysicsShape.ContactFilter { categories = m_ProjectileMask, contacts =  m_DestructibleMask | m_GroundMask },
+                surfaceMaterial = new PhysicsShape.SurfaceMaterial { friction = 0.0f, bounciness = 0.3f },
+                contactEvents = true
+            };
 
             // Fire all the projectiles.
             var definitions = new NativeArray<PhysicsBodyDefinition>(1, Allocator.Temp);
@@ -69,8 +92,8 @@ public class LargePyramid : MonoBehaviour
             {
                 // Calculate the fire spread.
                 var halfSpread = 1 * 0.5f;
-                var fireDirection = new Vector2(1, 1.1f);
-                var fireSpeed = 50f;
+                var fireDirection = new Vector2(1, 0.5f);
+                var fireSpeed = 500f;
 
                 // Create the projectile body.
                 bodyDef.position = new Vector2(-100, 2);
@@ -89,7 +112,9 @@ public class LargePyramid : MonoBehaviour
                 // Create the projectile shape.
                 shapeDef.surfaceMaterial.customColor = m_SandboxManager.ShapeColorState;
                 var body = bodies[i];
-                body.CreateShape(capsuleGeometry, shapeDef);
+                body.callbackTarget = this;
+               var shape =  body.CreateShape(capsuleGeometry, shapeDef);
+               shape.callbackTarget = this;
             }
 
             // Dispose.
@@ -154,17 +179,25 @@ public class LargePyramid : MonoBehaviour
         {
             var groundBody = world.CreateBody(new PhysicsBodyDefinition { position = new Vector2(0f, -1f) });
 
+            var shapeDef = new PhysicsShapeDefinition
+            {
+              //  contactFilter = new PhysicsShape.ContactFilter { categories = m_GroundMask, contacts = m_ProjectileMask | m_DestructibleMask },
+            };
             const float groundLength = 1000f;
-            groundBody.CreateShape(PolygonGeometry.CreateBox(new Vector2(groundLength, 2f)), PhysicsShapeDefinition.defaultDefinition);
-            groundBody.CreateShape(PolygonGeometry.CreateBox(new Vector2(groundLength, 2f), radius: 0f, new PhysicsTransform(new Vector2(0f, groundLength), PhysicsRotate.identity)), PhysicsShapeDefinition.defaultDefinition);
-            groundBody.CreateShape(PolygonGeometry.CreateBox(new Vector2(2f, groundLength), radius: 0f, new PhysicsTransform(new Vector2(groundLength * -0.5f, groundLength * 0.5f), PhysicsRotate.identity)), PhysicsShapeDefinition.defaultDefinition);
-            groundBody.CreateShape(PolygonGeometry.CreateBox(new Vector2(2f, groundLength), radius: 0f, new PhysicsTransform(new Vector2(groundLength * 0.5f, groundLength * 0.5f), PhysicsRotate.identity)), PhysicsShapeDefinition.defaultDefinition);
+            groundBody.CreateShape(PolygonGeometry.CreateBox(new Vector2(groundLength, 2f)), shapeDef);
+            groundBody.CreateShape(PolygonGeometry.CreateBox(new Vector2(groundLength, 2f), radius: 0f, new PhysicsTransform(new Vector2(0f, groundLength), PhysicsRotate.identity)), shapeDef);
+            groundBody.CreateShape(PolygonGeometry.CreateBox(new Vector2(2f, groundLength), radius: 0f, new PhysicsTransform(new Vector2(groundLength * -0.5f, groundLength * 0.5f), PhysicsRotate.identity)), shapeDef);
+            groundBody.CreateShape(PolygonGeometry.CreateBox(new Vector2(2f, groundLength), radius: 0f, new PhysicsTransform(new Vector2(groundLength * 0.5f, groundLength * 0.5f), PhysicsRotate.identity)), shapeDef);
         }
 
         // Pyramid.
         {
             var bodyDef = new PhysicsBodyDefinition { bodyType = RigidbodyType2D.Dynamic };
-            var shapeDef = PhysicsShapeDefinition.defaultDefinition;
+            var shapeDef = new PhysicsShapeDefinition
+            {
+               // contactFilter = new PhysicsShape.ContactFilter { categories = m_DestructibleMask, contacts = m_ProjectileMask | m_GroundMask },
+                contactEvents = true
+            };
 
             const float halfHeight = 0.5f;
             const float radius = 0.05f;
