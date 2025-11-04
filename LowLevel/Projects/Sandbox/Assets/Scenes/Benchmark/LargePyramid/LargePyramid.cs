@@ -56,7 +56,23 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     public void OnContactBegin2D(PhysicsEvents.ContactBeginEvent beginEvent)
     {
-        Debug.Log("CONTANT");
+        const float radius = 10f;
+        PhysicsWorld.defaultWorld.DrawCircle(beginEvent.shapeB.transform.position, radius, Color.orangeRed, 0.09f, PhysicsWorld.DrawFillOptions.All);
+        var explodeDef = new PhysicsWorld.ExplosionDefinition { position = beginEvent.shapeB.transform.position, radius = radius, falloff = 2f, impulsePerLength = 90f };
+
+        // Explode in all the worlds.
+        using var worlds = PhysicsWorld.GetWorlds();
+        foreach (var world in worlds)
+            world.Explode(explodeDef);
+        if (beginEvent.shapeA.body.bodyType != RigidbodyType2D.Static)
+        {
+            beginEvent.shapeA.Destroy();
+        }
+        if (beginEvent.shapeB.body.bodyType != RigidbodyType2D.Static)
+        {
+            beginEvent.shapeB.Destroy();
+        }
+
     }
 
 
@@ -92,11 +108,11 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             {
                 // Calculate the fire spread.
                 var halfSpread = 1 * 0.5f;
-                var fireDirection = new Vector2(1, 0.5f);
+                var fireDirection = new Vector2(1, 0.3f);
                 var fireSpeed = 500f;
 
                 // Create the projectile body.
-                bodyDef.position = new Vector2(-100, 2);
+                bodyDef.position = new Vector2(-100, 4);
                 bodyDef.rotation = new PhysicsRotate(random.NextFloat(-3f, 3f));
                 bodyDef.linearVelocity = fireDirection * fireSpeed;
 
@@ -177,7 +193,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
         // Ground.
         {
-            var groundBody = world.CreateBody(new PhysicsBodyDefinition { position = new Vector2(0f, -1f) });
+            var groundBody = world.CreateBody(new PhysicsBodyDefinition { position = new Vector2(0f, -1f), bodyType = RigidbodyType2D.Static});
 
             var shapeDef = new PhysicsShapeDefinition
             {
