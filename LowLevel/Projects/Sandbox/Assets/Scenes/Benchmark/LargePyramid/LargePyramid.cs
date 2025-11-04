@@ -1,4 +1,7 @@
+using Unity.Collections;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.LowLevelPhysics2D;
 using UnityEngine.UIElements;
 
@@ -27,20 +30,77 @@ public class LargePyramid : MonoBehaviour
         // Set up the scene reset action.
         m_SandboxManager.SceneResetAction = SetupScene;
 
-        m_BaseCount = 60;
+        m_BaseCount = 90;
         m_OldGravity = PhysicsWorld.defaultWorld.gravity;
-        m_GravityScale = 1f;
+        m_GravityScale = 2f;
 
         SetupOptions();
 
         SetupScene();
     }
 
+    private void Update()
+    {
+        if (Keyboard.current.spaceKey.wasReleasedThisFrame)
+        {
+            Shoot();
+        }
+    }
+
+    private void Shoot()
+    {
+              ref var random = ref m_SandboxManager.Random;
+
+              var capsuleRadius = 1;
+            var capsuleLength = capsuleRadius;
+            var capsuleGeometry = new CapsuleGeometry
+            {
+                center1 = Vector2.left * capsuleLength,
+                center2 = Vector2.right * capsuleLength,
+                radius = capsuleRadius
+            };
+
+            var bodyDef = new PhysicsBodyDefinition { bodyType = RigidbodyType2D.Dynamic, gravityScale = m_GravityScale, fastCollisionsAllowed = true };
+            var shapeDef = new PhysicsShapeDefinition { contactFilter = PhysicsShape.ContactFilter.defaultFilter, surfaceMaterial = new PhysicsShape.SurfaceMaterial { friction = 0.0f, bounciness = 0.3f } };
+
+            // Fire all the projectiles.
+            var definitions = new NativeArray<PhysicsBodyDefinition>(1, Allocator.Temp);
+            for (var i = 0; i < 1; ++i)
+            {
+                // Calculate the fire spread.
+                var halfSpread = 1 * 0.5f;
+                var fireDirection = new Vector2(1, 1.1f);
+                var fireSpeed = 50f;
+
+                // Create the projectile body.
+                bodyDef.position = new Vector2(-100, 2);
+                bodyDef.rotation = new PhysicsRotate(random.NextFloat(-3f, 3f));
+                bodyDef.linearVelocity = fireDirection * fireSpeed;
+
+                definitions[i] = bodyDef;
+            }
+
+            // Create the bodies.
+            using var bodies = PhysicsWorld.defaultWorld.CreateBodyBatch(definitions);
+
+            // Create the capsules.
+            for (var i = 0; i < 1; ++i)
+            {
+                // Create the projectile shape.
+                shapeDef.surfaceMaterial.customColor = m_SandboxManager.ShapeColorState;
+                var body = bodies[i];
+                body.CreateShape(capsuleGeometry, shapeDef);
+            }
+
+            // Dispose.
+            definitions.Dispose();
+    }
+
     private void OnDisable()
     {
         // Get the default world.
         var world = PhysicsWorld.defaultWorld;
-        
+
         world.gravity = m_OldGravity;
     }
 
@@ -69,10 +129,10 @@ public class LargePyramid : MonoBehaviour
             gravityScale.RegisterValueChangedCallback(evt =>
             {
                 m_GravityScale = evt.newValue;
-                
+
                 // Get the default world.
                 var world = PhysicsWorld.defaultWorld;
-                
+
                 world.gravity = m_OldGravity * m_GravityScale;
             });
 
