@@ -4,12 +4,14 @@ using System.Linq;
 using Unity.Collections;
 using Unity.Jobs.LowLevel.Unsafe;
 using Unity.Mathematics;
+using Unity.Netcode;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.LowLevelPhysics2D;
 using UnityEngine.U2D.Physics.LowLevelExtras;
 using UnityEngine.UIElements;
+using Object = System.Object;
 using Random = Unity.Mathematics.Random;
 
 public class SandboxManager : MonoBehaviour, IShapeColorProvider
@@ -26,9 +28,9 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
         get => m_CameraZoomElement.value;
         set => m_CameraZoomElement.value = value;
     }
-    
+
     public UIDocument SceneOptionsUI { get; set; }
-    
+
     public enum FrequencySelection
     {
         Hertz15,
@@ -44,7 +46,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
         private set
         {
             m_FrequencySelection = value;
-            
+
             var fixedRate = m_FrequencySelection != FrequencySelection.Variable;
             if (fixedRate)
             {
@@ -62,15 +64,15 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
             using var worlds = PhysicsWorld.GetWorlds();
             foreach (var world in worlds)
                 world.simulationMode = fixedRate ? SimulationMode2D.FixedUpdate : SimulationMode2D.Update;
-            
+
         }
     }
 
     private bool ColorShapeState { get; set; }
-    private ControlsMenu.CustomButton m_PausePlayButton;    
-    private ControlsMenu.CustomButton m_SingleStepButton;    
+    private ControlsMenu.CustomButton m_PausePlayButton;
+    private ControlsMenu.CustomButton m_SingleStepButton;
     private ControlsMenu.CustomButton m_ResetButton;
-    private ControlsMenu.CustomButton m_DebugButton;    
+    private ControlsMenu.CustomButton m_DebugButton;
     private ControlsMenu.CustomButton m_UIButton;
     private ControlsMenu.CustomButton m_QuitButton;
 
@@ -156,7 +158,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
 
     private readonly List<TreeViewItemData<string>> m_ViewItems = new();
     private Random m_Random;
-    
+
     private void Start()
     {
 #if UNITY_EDITOR
@@ -171,7 +173,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
 
         // Show the Shortcut view by default.
         ShortcutsView.gameObject.SetActive(true);
-        
+
         // Reset the controls.
         ControlsMenu.ResetControls();
         m_PausePlayButton = ControlsMenu.pausePlayButton;
@@ -180,13 +182,13 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
         m_DebugButton = ControlsMenu.debugButton;
         m_UIButton = ControlsMenu.uiButton;
         m_QuitButton = ControlsMenu.quitButton;
-        
+
         m_PausePlayButton.button.clickable.clicked += TogglePausePlay;
         m_SingleStepButton.button.clickable.clicked += SingleStep;
         m_ResetButton.button.clickable.clicked += ResetScene;
-        m_DebugButton.button.clickable.clicked += ToggleDebugView; 
+        m_DebugButton.button.clickable.clicked += ToggleDebugView;
         m_UIButton.button.clickable.clicked += ToggleUI;
-        
+
         m_PausePlayButton.button.text = WorldPaused ? $"Play [{SandboxUtility.HighlightColor}P{SandboxUtility.EndHighlightColor}]" : $"Pause [{SandboxUtility.HighlightColor}P{SandboxUtility.EndHighlightColor}]";
         m_SingleStepButton.button.enabledSelf = WorldPaused;
         m_SingleStepButton.button.text = $"Single-Step [{SandboxUtility.HighlightColor}S{SandboxUtility.EndHighlightColor}]";
@@ -194,7 +196,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
         m_DebugButton.button.text = $"Debug UI [{SandboxUtility.HighlightColor}D{SandboxUtility.EndHighlightColor}]";
         m_UIButton.button.text = $"All UI [{SandboxUtility.HighlightColor}Tab{SandboxUtility.EndHighlightColor}]";
         m_QuitButton.button.text = $"Quit [{SandboxUtility.HighlightColor}Esc{SandboxUtility.EndHighlightColor}]";
-        
+
         var defaultWorld = PhysicsWorld.defaultWorld;
         m_MenuDefaults = new MenuDefaults
         {
@@ -236,7 +238,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
         m_OverrideDrawOptions = PhysicsWorld.DrawOptions.Off;
         m_OverridePreviousDrawOptions = PhysicsWorld.DrawOptions.Off;
     }
-    
+
     private void Update()
     {
         // Controls.
@@ -285,7 +287,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
                 ToggleUI();
                 return;
             }
-            
+
             // Toggle Color PhysicsShape State.
             if (currentKeyboard.cKey.wasPressedThisFrame)
             {
@@ -336,7 +338,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
 
         // Toggle Shortcut View.
         ShortcutsView.gameObject.SetActive(!ShortcutsView.gameObject.activeInHierarchy);
-                
+
         // Main Menu.
         m_MainMenuDocument.rootVisualElement.style.display = m_ShowUI ? DisplayStyle.Flex : DisplayStyle.None;
     }
@@ -345,7 +347,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
     {
         m_ShowDebugElement.value = !m_ShowDebugElement.value;
     }
-    
+
     public void ResetSceneState()
     {
         // Disable any "SceneBody".
@@ -358,7 +360,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
 
         {
             var destroyBodies = new NativeList<PhysicsBody>(1000, Allocator.Temp);
-            
+
             // Iterate all worlds.
             using var allWorlds = PhysicsWorld.GetWorlds();
             foreach (var world in allWorlds)
@@ -374,7 +376,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
 
             if (destroyBodies.Length > 0)
                 PhysicsWorld.DestroyBodyBatch(destroyBodies.AsArray());
-            
+
             // Dispose.
             destroyBodies.Dispose();
         }
@@ -396,7 +398,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
         foreach (var sceneBody in FindObjectsByType<SceneBody>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             sceneBody.enabled = true;
     }
-    
+
     private void SetupOptions()
     {
         var root = m_MainMenuDocument.rootVisualElement;
@@ -690,7 +692,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
         // Unpause the world if paused.
         if (WorldPaused)
             TogglePausePlay();
-        
+
         m_CameraManipulator.ResetPanZoom();
         m_CameraZoomElement.value = m_CameraManipulator.CameraZoom;
 
@@ -699,7 +701,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
 
         // Reset the controls.
         ControlsMenu.ResetControls();
-        
+
         SceneOptionsUI = null;
         SceneResetAction = null;
         m_SceneManifest.LoadScene(sceneName, ResetSceneState);
@@ -710,10 +712,12 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
         if (!m_DisableUIRestarts)
             SceneResetAction?.Invoke();
     }
-    
+
     // Reset the settings and reload the current scene.
     private void Restart()
     {
+        GameObject.FindFirstObjectByType<NetworkManager>().StartHost();
+        return;
         m_DisableUIRestarts = true;
 
         // Worlds.
@@ -767,9 +771,12 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
 
     private void SingleStep()
     {
+
+        GameObject.FindFirstObjectByType<NetworkManager>().StartClient();
+        return;
         if (!WorldPaused)
             return;
-        
+
         var defaultWorld = PhysicsWorld.defaultWorld;
 
         // Update the worlds.
@@ -867,6 +874,6 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
     }
 
     public void ShowFPS() => m_BarFPS.style.display = DisplayStyle.Flex;
-    
+
     public void HideFPS() => m_BarFPS.style.display = DisplayStyle.None;
 }
