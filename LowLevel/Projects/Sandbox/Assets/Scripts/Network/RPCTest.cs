@@ -6,16 +6,17 @@ public class RpcTest : NetworkBehaviour
 
     public static RpcTest Instance;
 
-    public override void OnNetworkSpawn()
+    public void Start()
     {
         Instance = this;
+    }
+    public override void OnNetworkSpawn()
+    {
         if (!IsServer && IsOwner) //Only send an RPC to the server from the client that owns the NetworkObject of this NetworkBehaviour instance
         {
             //ServerOnlyRpc(0, NetworkObjectId);
         }
     }
-
-    public override void OnNetworkObjectParentChanged(NetworkObject parentNetworkObject) { }
 
     [Rpc(SendTo.ClientsAndHost)]
     void ClientAndHostRpc(int value, ulong sourceNetworkObjectId)
