@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -104,8 +105,15 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
         var ticksTimeSpan = new TimeSpan(ticks);
         var timeSpan = m_startTime -DateTime.UtcNow + ticksTimeSpan;
-        Invoke(nameof(DoShoot), (float)timeSpan.TotalMilliseconds / 1000f);
+        ShootAfter((int)timeSpan.TotalMilliseconds);
+        //Invoke(nameof(DoShoot), (float)timeSpan.TotalMilliseconds / 1000f);
         //m_nextShootTime = m_startTime + new TimeSpan(ticks);
+    }
+
+    private async void ShootAfter(int msDelay)
+    {
+        await Task.Delay(msDelay);
+        DoShoot();
     }
 
     private DateTime m_startTime = DateTime.MinValue;
