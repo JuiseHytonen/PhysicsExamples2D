@@ -90,8 +90,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     {
         if (m_nextShootTime != DateTime.MinValue && m_nextShootTime <= DateTime.UtcNow)
         {
-            DoShoot();
-            m_nextShootTime = DateTime.MinValue;
+        //    DoShoot();
+         //   m_nextShootTime = DateTime.MinValue;
         }
     }
 
