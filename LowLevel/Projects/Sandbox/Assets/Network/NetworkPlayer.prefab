@@ -50,13 +50,13 @@ MonoBehaviour:
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 0
+  SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 0
-  SpawnWithObservers: 0
+  SpawnWithObservers: 1
   DontDestroyWithOwner: 0
-  AutoObjectParentSync: 0
-  SyncOwnerTransformWhenParented: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
 --- !u!114 &-4477614688321568789
 MonoBehaviour:
