@@ -1,4 +1,5 @@
 using Unity.Netcode;
+using UnityEditor.AppleTV;
 using UnityEngine;
 
 public class RpcTest : NetworkBehaviour
@@ -35,18 +36,18 @@ public class RpcTest : NetworkBehaviour
         ClientAndHostRpc(value, sourceNetworkObjectId);
     }
 
-    public static void SendMessageToOthers(string message)
+    public static void SendMessageToOthers(long ticks)
     {
-        Instance.SendMessageToOthersRpc(message);
+        Instance.SendMessageToOthersRpc(ticks);
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void SendMessageToOthersRpc(string message)
+    private void SendMessageToOthersRpc(long ticks)
     {
         if (!Instance.IsHost)
         {
-            LargePyramid.Instance.Shoot();
-            Debug.Log($"Client Received the RPC {message} on NetworkObject #{Instance.NetworkObjectId}");
+            LargePyramid.Instance.ShootAtTime(ticks);
+           // Debug.Log($"Client Received the RPC {millis} on NetworkObject #{Instance.NetworkObjectId}");
         }
     }
 

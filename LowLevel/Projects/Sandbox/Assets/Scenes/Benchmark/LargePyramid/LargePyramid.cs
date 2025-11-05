@@ -1,8 +1,10 @@
+using System;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.LowLevelPhysics2D;
 using UnityEngine.UIElements;
+using TimeSpan = System.TimeSpan;
 
 public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 {
@@ -52,8 +54,9 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     {
         if (Keyboard.current.spaceKey.wasReleasedThisFrame)
         {
-            Shoot(true);
+            Shoot();
         }
+
     }
 
     public void OnContactBegin2D(PhysicsEvents.ContactBeginEvent beginEvent)
@@ -83,12 +86,52 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     }
 
-    public void Shoot(bool sendMessage = false)
+    private void FixedUpdate()
     {
-        if (sendMessage)
+        if (m_nextShootTime != DateTime.MinValue && m_nextShootTime <= DateTime.UtcNow)
         {
-            RpcTest.SendMessageToOthers("jeep");
+            DoShoot();
+            m_nextShootTime = DateTime.MinValue;
         }
+    }
+
+    public void ShootAtTime(long ticks)
+    {
+        if (m_startTime == DateTime.MinValue)
+        {
+            m_startTime = DateTime.UtcNow;
+        }
+
+        var ticksTimeSpan = new TimeSpan(ticks);
+        var timeSpan = m_startTime -DateTime.UtcNow + ticksTimeSpan;
+        Invoke(nameof(DoShoot), (float)timeSpan.TotalMilliseconds / 1000f);
+        //m_nextShootTime = m_startTime + new TimeSpan(ticks);
+    }
+
+    private DateTime m_startTime = DateTime.MinValue;
+    private DateTime m_nextShootTime;
+    private TimeSpan m_shootDelay = new TimeSpan(0, 0, 1);
+
+    private void Shoot()
+    {
+        if (m_startTime == DateTime.MinValue)
+        {
+            RpcTest.SendMessageToOthers(m_shootDelay.Ticks);
+            //m_startTime = DateTime.UtcNow;
+            ShootAtTime(m_shootDelay.Ticks);
+        }
+        else
+        {
+            var ticks = (DateTime.UtcNow - m_startTime + m_shootDelay).Ticks;
+            RpcTest.SendMessageToOthers(ticks);
+            ShootAtTime(ticks);
+        }
+    }
+
+    private void DoShoot()
+    {
+
+
               ref var random = ref m_SandboxManager.Random;
 
               var capsuleRadius = 1;
