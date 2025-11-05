@@ -83,6 +83,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     private void Shoot()
     {
+        RpcTest.SendMessageToOthers("jeep");
               ref var random = ref m_SandboxManager.Random;
 
               var capsuleRadius = 1;
