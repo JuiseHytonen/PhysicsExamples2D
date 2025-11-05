@@ -45,6 +45,7 @@ public class RpcTest : NetworkBehaviour
     {
         if (!Instance.IsHost)
         {
+            LargePyramid.Instance.Shoot();
             Debug.Log($"Client Received the RPC {message} on NetworkObject #{Instance.NetworkObjectId}");
         }
     }

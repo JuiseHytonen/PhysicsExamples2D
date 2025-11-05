@@ -6,6 +6,7 @@ using UnityEngine.UIElements;
 
 public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 {
+    public static LargePyramid Instance;
     private readonly PhysicsMask m_GroundMask = new(1);
     private readonly PhysicsMask m_DestructibleMask = new(2);
     private readonly PhysicsMask m_ProjectileMask = new(3);
@@ -23,6 +24,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     private void OnEnable()
     {
+        Instance = this;
         m_SandboxManager = FindFirstObjectByType<SandboxManager>();
         m_SceneManifest = FindFirstObjectByType<SceneManifest>();
         m_UIDocument = GetComponent<UIDocument>();
@@ -50,7 +52,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     {
         if (Keyboard.current.spaceKey.wasReleasedThisFrame)
         {
-            Shoot();
+            Shoot(true);
         }
     }
 
@@ -81,9 +83,12 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     }
 
-    private void Shoot()
+    public void Shoot(bool sendMessage = false)
     {
-        RpcTest.SendMessageToOthers("jeep");
+        if (sendMessage)
+        {
+            RpcTest.SendMessageToOthers("jeep");
+        }
               ref var random = ref m_SandboxManager.Random;
 
               var capsuleRadius = 1;
