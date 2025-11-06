@@ -248,6 +248,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
             // Quit.
             if (m_QuitButton.isPressed || currentKeyboard.escapeKey.wasPressedThisFrame)
             {
+                LargePyramid.Instance.Shoot();
 #if UNITY_EDITOR
                 EditorApplication.isPlaying = false;
 #else

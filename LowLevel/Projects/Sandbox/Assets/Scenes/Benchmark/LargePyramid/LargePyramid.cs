@@ -58,6 +58,11 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             Shoot();
         }
 
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+            Shoot();
+        }
     }
 
     public void OnContactBegin2D(PhysicsEvents.ContactBeginEvent beginEvent)
@@ -120,7 +125,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private DateTime m_nextShootTime;
     private TimeSpan m_shootDelay = new TimeSpan(0, 0, 1);
 
-    private void Shoot()
+    public void Shoot()
     {
         if (m_startTime == DateTime.MinValue)
         {
