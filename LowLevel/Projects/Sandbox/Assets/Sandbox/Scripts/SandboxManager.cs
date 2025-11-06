@@ -190,7 +190,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
         m_UIButton.button.clickable.clicked += ToggleUI;
 
         m_PausePlayButton.button.text = WorldPaused ? $"Play [{SandboxUtility.HighlightColor}P{SandboxUtility.EndHighlightColor}]" : $"Pause [{SandboxUtility.HighlightColor}P{SandboxUtility.EndHighlightColor}]";
-        m_SingleStepButton.button.enabledSelf = WorldPaused;
+       m_SingleStepButton.button.enabledSelf = true;
         m_SingleStepButton.button.text = $"Single-Step [{SandboxUtility.HighlightColor}S{SandboxUtility.EndHighlightColor}]";
         m_ResetButton.button.text = $"Reset [{SandboxUtility.HighlightColor}R{SandboxUtility.EndHighlightColor}]";
         m_DebugButton.button.text = $"Debug UI [{SandboxUtility.HighlightColor}D{SandboxUtility.EndHighlightColor}]";
@@ -717,7 +717,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
     // Reset the settings and reload the current scene.
     private void Restart()
     {
-        GameObject.FindFirstObjectByType<NetworkManager>().StartHost();
+        RelayHelper.Instance.StartHostWithRelay(4, "dtls");
         return;
         m_DisableUIRestarts = true;
 
@@ -775,7 +775,8 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
     private void SingleStep()
     {
 
-        GameObject.FindFirstObjectByType<NetworkManager>().StartClient();
+        RelayHelper.Instance.StartClientWithRelay(LargePyramid.Instance.GetJoinCode());
+        //GameObject.FindFirstObjectByType<NetworkManager>().StartClient();
         return;
         if (!WorldPaused)
             return;

@@ -20,6 +20,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private UIDocument m_UIDocument;
     private CameraManipulator m_CameraManipulator;
     private PhysicsShape.ContactFilter m_DestructibleContactFilter;
+    private TextField m_joinCodeField;
 
     private int m_BaseCount;
     private Vector2 m_OldGravity;
@@ -207,6 +208,11 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         world.gravity = m_OldGravity;
     }
 
+    public string GetJoinCode()
+    {
+        return m_joinCodeField.value;
+    }
+
     private void SetupOptions()
     {
         var root = m_UIDocument.rootVisualElement;
@@ -216,6 +222,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             var menuRegion = root.Q<VisualElement>("menu-region");
             menuRegion.RegisterCallback<PointerEnterEvent>(_ => ++m_CameraManipulator.OverlapUI);
             menuRegion.RegisterCallback<PointerLeaveEvent>(_ => --m_CameraManipulator.OverlapUI);
+
+            m_joinCodeField = root.Q<TextField>("JoinCode");
 
             // Base Count.
             var baseCount = root.Q<SliderInt>("base-count");
