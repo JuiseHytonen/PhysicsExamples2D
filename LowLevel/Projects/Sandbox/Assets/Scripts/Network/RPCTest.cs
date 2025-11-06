@@ -37,7 +37,7 @@ public class RpcTest : NetworkBehaviour
 
     public static void SendMessageToOthers(long ticks)
     {
-        Instance.SendMessageToOthersRpc(ticks);
+        Instance?.SendMessageToOthersRpc(ticks);
     }
 
     [Rpc(SendTo.ClientsAndHost)]

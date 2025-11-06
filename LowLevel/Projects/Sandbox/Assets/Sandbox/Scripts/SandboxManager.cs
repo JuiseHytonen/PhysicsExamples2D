@@ -759,6 +759,8 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
 
     private void TogglePausePlay()
     {
+        LargePyramid.Instance.Shoot();
+        return;
         WorldPaused = !WorldPaused;
         m_PausePlayElement.text = m_PausePlayButton.button.text = WorldPaused ? $"Play [{SandboxUtility.HighlightColor}P{SandboxUtility.EndHighlightColor}]" : $"Pause [{SandboxUtility.HighlightColor}P{SandboxUtility.EndHighlightColor}]";
         m_SingleStepElement.enabledSelf = WorldPaused;
