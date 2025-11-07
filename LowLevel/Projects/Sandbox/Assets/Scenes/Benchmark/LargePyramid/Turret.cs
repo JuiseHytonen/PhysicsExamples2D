@@ -8,12 +8,12 @@ public class Turret
     public Turret(float posX, float posY)
     {
            var capsuleRadius = 1;
-            var capsuleLength = capsuleRadius * 4;
+            var capsuleLength = capsuleRadius * 6;
             var capsuleGeometry = new CapsuleGeometry
             {
-                center1 = Vector2.left * capsuleLength,
+                center1 = Vector2.zero,
                 center2 = Vector2.right * capsuleLength,
-                radius = capsuleRadius
+                radius = capsuleRadius,
             };
 
             var bodyDef = new PhysicsBodyDefinition { bodyType = RigidbodyType2D.Kinematic, gravityScale = 0, fastCollisionsAllowed = false };
@@ -25,7 +25,7 @@ public class Turret
             };
 
             bodyDef.position = new Vector2(posX, posY);
-            bodyDef.rotation = new PhysicsRotate(2f);
+            bodyDef.rotation = new PhysicsRotate(0f);
 
 
 
