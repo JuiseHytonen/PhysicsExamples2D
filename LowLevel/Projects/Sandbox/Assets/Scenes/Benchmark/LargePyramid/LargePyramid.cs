@@ -119,7 +119,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         }
     }
 
-    public void ShootAtTime(long ticks)
+    public void ShootAtTime(long ticks, bool isMe)
     {
         if (m_startTime == DateTime.MinValue)
         {
@@ -128,17 +128,17 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
         var ticksTimeSpan = new TimeSpan(ticks);
         var timeSpan = m_startTime -DateTime.UtcNow + ticksTimeSpan;
-        ShootAfter((int)timeSpan.TotalMilliseconds);
+        ShootAfter((int)timeSpan.TotalMilliseconds, isMe);
         //Invoke(nameof(DoShoot), (float)timeSpan.TotalMilliseconds / 1000f);
         //m_nextShootTime = m_startTime + new TimeSpan(ticks);
     }
 
-    private async void ShootAfter(int msDelay)
+    private async void ShootAfter(int msDelay, bool isMe)
     {
         await Task.Delay(msDelay);
         Debug.Log("delay " + msDelay);
        // ShootAfter(1000);
-        DoShoot();
+        DoShoot(isMe);
     }
 
     private DateTime m_startTime = DateTime.MinValue;
@@ -146,6 +146,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private TimeSpan m_shootDelay = new TimeSpan(0, 0, 1);
 
     private Turret MyTurret => !RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
+    private Turret OtherTurret => RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
+
 
     public void Shoot()
     {
@@ -154,13 +156,13 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         {
             RpcTest.SendMessageToOthers(m_shootDelay.Ticks);
             //m_startTime = DateTime.UtcNow;
-            ShootAtTime(m_shootDelay.Ticks);
+            ShootAtTime(m_shootDelay.Ticks, true);
         }
         else
         {
             var ticks = (DateTime.UtcNow - m_startTime + m_shootDelay).Ticks;
             RpcTest.SendMessageToOthers(ticks);
-            ShootAtTime(ticks);
+            ShootAtTime(ticks, true);
         }
     }
 
@@ -171,7 +173,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         m_rightTurret = new Turret(100f, 5f);
     }
 
-    private void DoShoot()
+    private void DoShoot(bool isMe)
     {
               var capsuleRadius = 1;
             var capsuleLength = capsuleRadius;
@@ -196,11 +198,11 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             {
                 // Calculate the fire spread.
                 var halfSpread = 1 * 0.5f;
-                var fireDirection = MyTurret.GetRotation();
+                var fireDirection = isMe?MyTurret.GetRotation():OtherTurret.GetRotation();
                 var fireSpeed = 50f;
 
                 // Create the projectile body.
-                bodyDef.position = MyTurret.GetPosition();
+                bodyDef.position = isMe?MyTurret.GetPosition():OtherTurret.GetPosition();
                 bodyDef.rotation = new PhysicsRotate(2f);
                 bodyDef.linearVelocity = fireDirection * fireSpeed;
 

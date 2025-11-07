@@ -45,7 +45,7 @@ public class RpcTest : NetworkBehaviour
     {
     //    if (id != Instance.NetworkObjectId)
       //  {
-            LargePyramid.Instance.ShootAtTime(ticks);
+            LargePyramid.Instance.ShootAtTime(ticks, false);
            // Debug.Log($"Client Received the RPC {millis} on NetworkObject #{Instance.NetworkObjectId}");
         //}
     }
