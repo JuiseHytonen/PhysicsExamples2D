@@ -192,11 +192,11 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             {
                 // Calculate the fire spread.
                 var halfSpread = 1 * 0.5f;
-                var fireDirection = new Vector2(1, 0.3f);
-                var fireSpeed = 500f;
+                var fireDirection = m_leftTurret.GetRotation();
+                var fireSpeed = 50f;
 
                 // Create the projectile body.
-                bodyDef.position = new Vector2(-100, 4);
+                bodyDef.position = m_leftTurret.GetPosition();
                 bodyDef.rotation = new PhysicsRotate(2f);
                 bodyDef.linearVelocity = fireDirection * fireSpeed;
 

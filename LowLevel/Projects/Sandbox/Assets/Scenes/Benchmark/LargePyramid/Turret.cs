@@ -16,10 +16,10 @@ public class Turret
                 radius = capsuleRadius
             };
 
-            var bodyDef = new PhysicsBodyDefinition { bodyType = RigidbodyType2D.Dynamic, gravityScale = 0, fastCollisionsAllowed = true };
+            var bodyDef = new PhysicsBodyDefinition { bodyType = RigidbodyType2D.Kinematic, gravityScale = 0, fastCollisionsAllowed = false };
             var shapeDef = new PhysicsShapeDefinition
             {
-                //contactFilter = new PhysicsShape.ContactFilter { categories = m_ProjectileMask, contacts =  m_DestructibleMask | m_GroundMask },
+                contactFilter = new PhysicsShape.ContactFilter { categories = 0, contacts =  0 },
                 surfaceMaterial = new PhysicsShape.SurfaceMaterial { friction = 0.0f, bounciness = 0.3f },
                 contactEvents = true
             };
@@ -44,6 +44,16 @@ public class Turret
     public void RotateLeft()
     {
         m_Body.rotation = m_Body.rotation.Rotate(-TURRET_ROTATION_SPEED);
+    }
+
+    public Vector2 GetRotation()
+    {
+        return m_Body.rotation.direction;
+    }
+
+    public Vector2 GetPosition()
+    {
+        return m_Body.position;
     }
 
 }
