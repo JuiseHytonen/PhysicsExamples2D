@@ -27,6 +27,7 @@ public class RelayHelper : MonoBehaviour
         var allocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(allocation.ToRelayServerData(connectionType));
         var joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+        Debug.Log("joincode " + joinCode);
         return NetworkManager.Singleton.StartHost() ? joinCode : null;
     }
 

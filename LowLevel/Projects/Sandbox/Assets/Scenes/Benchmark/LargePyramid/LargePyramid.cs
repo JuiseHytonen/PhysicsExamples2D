@@ -144,10 +144,6 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     private void DoShoot()
     {
-
-
-              ref var random = ref m_SandboxManager.Random;
-
               var capsuleRadius = 1;
             var capsuleLength = capsuleRadius;
             var capsuleGeometry = new CapsuleGeometry
@@ -176,7 +172,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
                 // Create the projectile body.
                 bodyDef.position = new Vector2(-100, 4);
-                bodyDef.rotation = new PhysicsRotate(random.NextFloat(-3f, 3f));
+                bodyDef.rotation = new PhysicsRotate(2f);
                 bodyDef.linearVelocity = fireDirection * fireSpeed;
 
                 definitions[i] = bodyDef;
