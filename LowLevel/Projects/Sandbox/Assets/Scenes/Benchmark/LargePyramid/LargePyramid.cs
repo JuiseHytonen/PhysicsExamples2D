@@ -13,6 +13,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private readonly PhysicsMask m_GroundMask = new(1);
     private readonly PhysicsMask m_DestructibleMask = new(2);
     private readonly PhysicsMask m_ProjectileMask = new(3);
+    private Turret m_leftTurret;
+    private Turret m_rightTurret;
 
 
     private SandboxManager m_SandboxManager;
@@ -62,6 +64,17 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         {
             Shoot();
         }
+
+        if (Keyboard.current.rightArrowKey.isPressed)
+        {
+            m_leftTurret.RotateLeft();
+        }
+
+        if (Keyboard.current.leftArrowKey.isPressed)
+        {
+            m_leftTurret.RotateRight();
+        }
+
 
         if (Input.touchCount > 0)
         {
@@ -124,7 +137,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     {
         await Task.Delay(msDelay);
         Debug.Log("delay " + msDelay);
-        ShootAfter(1000);
+       // ShootAfter(1000);
         DoShoot();
     }
 
@@ -146,6 +159,12 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             RpcTest.SendMessageToOthers(ticks);
             ShootAtTime(ticks);
         }
+    }
+
+    private void CreateTurrets()
+    {
+        m_leftTurret = new Turret(-100f, 10f);
+        m_rightTurret = new Turret(-100f, 50f);
     }
 
     private void DoShoot()
@@ -262,6 +281,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
         // Get the default world.
         var world = PhysicsWorld.defaultWorld;
+
+        CreateTurrets();
 
         // Ground.
         {
