@@ -28,6 +28,10 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     private void OnEnable()
     {
+        if (Instance != null)
+        {
+            Destroy(Instance);
+        }
         Instance = this;
         m_SandboxManager = FindFirstObjectByType<SandboxManager>();
         m_SceneManifest = FindFirstObjectByType<SceneManifest>();
@@ -119,6 +123,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private async void ShootAfter(int msDelay)
     {
         await Task.Delay(msDelay);
+        Debug.Log("delay " + msDelay);
+        ShootAfter(1000);
         DoShoot();
     }
 
