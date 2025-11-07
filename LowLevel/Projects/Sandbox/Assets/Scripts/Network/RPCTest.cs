@@ -37,17 +37,17 @@ public class RpcTest : NetworkBehaviour
 
     public static void SendMessageToOthers(long ticks)
     {
-        Instance?.SendMessageToOthersRpc(ticks);
+        Instance?.SendMessageToOthersRpc(ticks, Instance.NetworkObjectId);
     }
 
-    [Rpc(SendTo.ClientsAndHost)]
-    private void SendMessageToOthersRpc(long ticks)
+    [Rpc(SendTo.NotMe)]
+    private void SendMessageToOthersRpc(long ticks, ulong id)
     {
-        if (!Instance.IsHost)
-        {
+    //    if (id != Instance.NetworkObjectId)
+      //  {
             LargePyramid.Instance.ShootAtTime(ticks);
            // Debug.Log($"Client Received the RPC {millis} on NetworkObject #{Instance.NetworkObjectId}");
-        }
+        //}
     }
 
 }

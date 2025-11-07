@@ -13,7 +13,7 @@ public class Turret
             {
                 center1 = Vector2.zero,
                 center2 = Vector2.right * capsuleLength,
-                radius = capsuleRadius,
+                radius = capsuleRadius
             };
 
             var bodyDef = new PhysicsBodyDefinition { bodyType = RigidbodyType2D.Static, gravityScale = 0, fastCollisionsAllowed = false };
@@ -32,9 +32,9 @@ public class Turret
 
             m_Body = PhysicsWorld.defaultWorld.CreateBody(bodyDef);
 
-            m_Body.callbackTarget = this;
+            //m_Body.callbackTarget = this;
             var shape =  m_Body.CreateShape(capsuleGeometry, shapeDef);
-            shape.callbackTarget = this;
+            //shape.callbackTarget = this;
     }
 
     public void RotateRight()

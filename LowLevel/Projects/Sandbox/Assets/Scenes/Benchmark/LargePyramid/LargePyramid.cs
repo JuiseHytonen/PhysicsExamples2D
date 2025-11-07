@@ -145,7 +145,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private DateTime m_nextShootTime;
     private TimeSpan m_shootDelay = new TimeSpan(0, 0, 1);
 
-    private Turret MyTurret => RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
+    private Turret MyTurret => !RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
 
     public void Shoot()
     {
