@@ -67,12 +67,12 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
         if (Keyboard.current.rightArrowKey.isPressed)
         {
-            m_leftTurret.RotateLeft();
+            MyTurret.RotateLeft();
         }
 
         if (Keyboard.current.leftArrowKey.isPressed)
         {
-            m_leftTurret.RotateRight();
+            MyTurret.RotateRight();
         }
 
 
@@ -145,8 +145,11 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private DateTime m_nextShootTime;
     private TimeSpan m_shootDelay = new TimeSpan(0, 0, 1);
 
+    private Turret MyTurret => RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
+
     public void Shoot()
     {
+
         if (m_startTime == DateTime.MinValue)
         {
             RpcTest.SendMessageToOthers(m_shootDelay.Ticks);
@@ -161,10 +164,11 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         }
     }
 
+
     private void CreateTurrets()
     {
-        m_leftTurret = new Turret(-100f, 10f);
-        m_rightTurret = new Turret(-100f, 50f);
+        m_leftTurret = new Turret(-100f, 5f);
+        m_rightTurret = new Turret(100f, 5f);
     }
 
     private void DoShoot()
@@ -173,8 +177,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             var capsuleLength = capsuleRadius;
             var capsuleGeometry = new CapsuleGeometry
             {
-                center1 = Vector2.left * capsuleLength,
-                center2 = Vector2.right * capsuleLength,
+                center1 = Vector2.left * (capsuleLength * .5f),
+                center2 = Vector2.right * (capsuleLength * .5f),
                 radius = capsuleRadius
             };
 
@@ -192,11 +196,11 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             {
                 // Calculate the fire spread.
                 var halfSpread = 1 * 0.5f;
-                var fireDirection = m_leftTurret.GetRotation();
+                var fireDirection = MyTurret.GetRotation();
                 var fireSpeed = 50f;
 
                 // Create the projectile body.
-                bodyDef.position = m_leftTurret.GetPosition();
+                bodyDef.position = MyTurret.GetPosition();
                 bodyDef.rotation = new PhysicsRotate(2f);
                 bodyDef.linearVelocity = fireDirection * fireSpeed;
 

@@ -16,12 +16,13 @@ public class Turret
                 radius = capsuleRadius,
             };
 
-            var bodyDef = new PhysicsBodyDefinition { bodyType = RigidbodyType2D.Kinematic, gravityScale = 0, fastCollisionsAllowed = false };
+            var bodyDef = new PhysicsBodyDefinition { bodyType = RigidbodyType2D.Static, gravityScale = 0, fastCollisionsAllowed = false };
             var shapeDef = new PhysicsShapeDefinition
             {
-                contactFilter = new PhysicsShape.ContactFilter { categories = 0, contacts =  0 },
+                contactFilter = new PhysicsShape.ContactFilter { },
                 surfaceMaterial = new PhysicsShape.SurfaceMaterial { friction = 0.0f, bounciness = 0.3f },
-                contactEvents = true
+                contactEvents = false,
+                contactFilterCallbacks = false
             };
 
             bodyDef.position = new Vector2(posX, posY);
