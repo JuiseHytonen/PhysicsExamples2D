@@ -23,7 +23,14 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private CameraManipulator m_CameraManipulator;
     private PhysicsShape.ContactFilter m_DestructibleContactFilter;
     private TextField m_joinCodeField;
+    private Button m_leftButton;
+    private Button m_rightButton;
+    private Button m_shootButton;
+    private Button m_hostButton;
+    private Button m_clientButton;
 
+    private bool m_leftButtonDown;
+    private bool m_rightButtonDown;
     private int m_BaseCount;
     private Vector2 m_OldGravity;
     private float m_GravityScale;
@@ -56,6 +63,51 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         SetupOptions();
 
         SetupScene();
+
+        var root = m_UIDocument.rootVisualElement;
+        m_leftButton = root.Q<Button>("LeftButton");
+
+        m_hostButton = root.Q<Button>("HostButton");
+        m_clientButton = root.Q<Button>("ClientButton");
+        m_shootButton = root.Q<Button>("ShootButton");
+        m_leftButton = root.Q<Button>("LeftButton");
+        m_rightButton = root.Q<Button>("RightButton");
+
+
+        m_leftButton.SetVisibleInHierarchy(false);
+        m_rightButton.SetVisibleInHierarchy(false);
+        m_shootButton.SetVisibleInHierarchy(false);
+
+        m_leftButton.RegisterCallback<MouseDownEvent>(evt => m_leftButtonDown = true);
+        m_leftButton.RegisterCallback<MouseUpEvent>(evt => m_leftButtonDown = false);
+        m_rightButton.RegisterCallback<MouseDownEvent>(evt => m_rightButtonDown = true);
+        m_rightButton.RegisterCallback<MouseUpEvent>(evt => m_rightButtonDown = false);
+        m_hostButton.RegisterCallback<MouseUpEvent>(OnHostClicked);
+        m_clientButton.RegisterCallback<MouseUpEvent>(OnClientClicked);
+    }
+
+    private async void OnClientClicked(MouseUpEvent evt)
+    {
+        var success = await RelayHelper.Instance.StartClientWithRelay(GetJoinCode());
+        if (success)
+        {
+            ShowMoveButtonsAndHideConnectButtons();
+        }
+    }
+
+    private async void OnHostClicked(MouseUpEvent evt)
+    {
+        var code = await RelayHelper.Instance.StartHostWithRelay(4, "dtls");
+        ShowMoveButtonsAndHideConnectButtons();
+    }
+
+    private void ShowMoveButtonsAndHideConnectButtons()
+    {
+        m_hostButton.SetVisibleInHierarchy(false);
+        m_clientButton.SetVisibleInHierarchy(false);
+        m_leftButton.SetVisibleInHierarchy(true);
+        m_rightButton.SetVisibleInHierarchy(true);
+        m_shootButton.SetVisibleInHierarchy(true);
     }
 
     private void Update()
@@ -65,13 +117,13 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             Shoot();
         }
 
-        if (Keyboard.current.rightArrowKey.isPressed)
+        if (Keyboard.current.rightArrowKey.isPressed || m_rightButtonDown)
         {
             var rotation = MyTurret.RotateLeft();
             RpcTest.SendRotateMessageToOthers(rotation);
         }
 
-        if (Keyboard.current.leftArrowKey.isPressed)
+        if (Keyboard.current.leftArrowKey.isPressed || m_leftButtonDown)
         {
             var rotation = MyTurret.RotateRight();
             RpcTest.SendRotateMessageToOthers(rotation);

@@ -98,4 +98,8 @@ Tab,
 .juise-button {
     height: 90px;
     width: 90px;
+    font-size: 22px;
+    -unity-font-style: bold;
+    margin-top: 0;
+    padding-top: 0;
 }

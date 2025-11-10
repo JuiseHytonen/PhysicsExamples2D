@@ -717,8 +717,6 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
     // Reset the settings and reload the current scene.
     private void Restart()
     {
-        RelayHelper.Instance.StartHostWithRelay(4, "dtls");
-        return;
         m_DisableUIRestarts = true;
 
         // Worlds.
