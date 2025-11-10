@@ -59,6 +59,7 @@ public class DebugView : MonoBehaviour
 
     private void OnEnable()
     {
+        return;
         m_CameraManipulator = FindFirstObjectByType<CameraManipulator>();
         m_UIDocument = GetComponent<UIDocument>();
         var root = m_UIDocument.rootVisualElement;
@@ -66,7 +67,7 @@ public class DebugView : MonoBehaviour
         // Reset the stats.
         ResetStats();
 
-        // Update states when a world has finished simulating. 
+        // Update states when a world has finished simulating.
         PhysicsEvents.PostSimulate += UpdateStats;
 
         // Menu Region.
@@ -127,7 +128,7 @@ public class DebugView : MonoBehaviour
 
     private void OnDisable()
     {
-        // Unsubscribe to the post-simulate event. 
+        // Unsubscribe to the post-simulate event.
         PhysicsEvents.PostSimulate -= UpdateStats;
     }
 

@@ -170,7 +170,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
         m_MainMenuDocument = GetComponent<UIDocument>();
 
         m_ShowUI = true;
-
+/*
         // Show the Shortcut view by default.
         ShortcutsView.gameObject.SetActive(true);
 
@@ -220,9 +220,9 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
             DrawImpulseScale = defaultWorld.drawImpulseScale,
             DrawOptions = defaultWorld.drawOptions
         };
-
+*/
         SetupSceneTree();
-        SetupOptions();
+     //   SetupOptions();
 
         m_UpdateTimeFPS = UpdatePeriodFPS;
     }
@@ -246,7 +246,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
             var currentKeyboard = Keyboard.current;
 
             // Quit.
-            if (m_QuitButton.isPressed || currentKeyboard.escapeKey.wasPressedThisFrame)
+            if (currentKeyboard.escapeKey.wasPressedThisFrame)
             {
                 LargePyramid.Instance.Shoot();
 #if UNITY_EDITOR
@@ -620,7 +620,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
 
     private void SetupSceneTree()
     {
-        var root = m_MainMenuDocument.rootVisualElement;
+   /*     var root = m_MainMenuDocument.rootVisualElement;
 
         // Fetch the tree.
         m_ScenesView = root.Q<TreeView>("scenes");
@@ -644,7 +644,7 @@ public class SandboxManager : MonoBehaviour, IShapeColorProvider
         m_ScenesView.selectionChanged += _ => TreeSelectionChanged();
         m_ScenesView.itemExpandedChanged += TreeExpandedChanged;
         m_ScenesView.Rebuild();
-
+*/
         // Load the start scene if specified.
         if (StartScene != string.Empty)
         {

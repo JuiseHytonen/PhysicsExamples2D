@@ -35,7 +35,7 @@ public class RpcTest : NetworkBehaviour
         ClientAndHostRpc(value, sourceNetworkObjectId);
     }
 
-    public static void SendMessageToOthers(long ticks)
+    public static void SendShootMessageToOthers(long ticks)
     {
         Instance?.SendShootMessageToOthersRpc(ticks, Instance.NetworkObjectId);
     }
@@ -43,11 +43,7 @@ public class RpcTest : NetworkBehaviour
     [Rpc(SendTo.NotMe)]
     private void SendShootMessageToOthersRpc(long ticks, ulong id)
     {
-    //    if (id != Instance.NetworkObjectId)
-      //  {
-            LargePyramid.Instance.ShootAtTime(ticks, false);
-           // Debug.Log($"Client Received the RPC {millis} on NetworkObject #{Instance.NetworkObjectId}");
-        //}
+        LargePyramid.Instance.ShootAtTime(ticks, false);
     }
 
     public static void SendRotateMessageToOthers(Vector2 rotation)
@@ -58,11 +54,6 @@ public class RpcTest : NetworkBehaviour
     [Rpc(SendTo.NotMe)]
     private void SendRotateMessageToOthersRpc(Vector2 rotation, ulong id)
     {
-        //    if (id != Instance.NetworkObjectId)
-        //  {
         LargePyramid.Instance.RotateOtherTurret(rotation);
-        // Debug.Log($"Client Received the RPC {millis} on NetworkObject #{Instance.NetworkObjectId}");
-        //}
     }
-
 }

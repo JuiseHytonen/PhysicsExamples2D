@@ -86,6 +86,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         m_shootButton.RegisterCallback<MouseUpEvent>(evt => Shoot());
         m_hostButton.RegisterCallback<MouseUpEvent>(OnHostClicked);
         m_clientButton.RegisterCallback<MouseUpEvent>(OnClientClicked);
+        Debug.developerConsoleEnabled = false;
     }
 
     private async void OnClientClicked(MouseUpEvent evt)
@@ -218,14 +219,14 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
         if (m_startTime == DateTime.MinValue)
         {
-            RpcTest.SendMessageToOthers(m_shootDelay.Ticks);
+            RpcTest.SendShootMessageToOthers(m_shootDelay.Ticks);
             //m_startTime = DateTime.UtcNow;
             ShootAtTime(m_shootDelay.Ticks, true);
         }
         else
         {
             var ticks = (DateTime.UtcNow - m_startTime + m_shootDelay).Ticks;
-            RpcTest.SendMessageToOthers(ticks);
+            RpcTest.SendShootMessageToOthers(ticks);
             ShootAtTime(ticks, true);
         }
     }
