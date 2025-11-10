@@ -98,7 +98,10 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private async void OnHostClicked(MouseUpEvent evt)
     {
         var code = await RelayHelper.Instance.StartHostWithRelay(4, "dtls");
-        ShowMoveButtonsAndHideConnectButtons();
+        if (code != null)
+        {
+            ShowMoveButtonsAndHideConnectButtons();
+        }
     }
 
     private void ShowMoveButtonsAndHideConnectButtons()
