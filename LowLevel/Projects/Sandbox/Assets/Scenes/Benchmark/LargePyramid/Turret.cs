@@ -37,19 +37,26 @@ public class Turret
             //shape.callbackTarget = this;
     }
 
-    public void RotateRight()
+    public Vector2 RotateRight()
     {
         m_Body.rotation = m_Body.rotation.Rotate(TURRET_ROTATION_SPEED);
+        return m_Body.rotation.direction;
     }
 
-    public void RotateLeft()
+    public Vector2 RotateLeft()
     {
         m_Body.rotation = m_Body.rotation.Rotate(-TURRET_ROTATION_SPEED);
+        return m_Body.rotation.direction;
     }
 
     public Vector2 GetRotation()
     {
         return m_Body.rotation.direction;
+    }
+
+    public void SetRotation(Vector2 rotation)
+    {
+        m_Body.rotation = new PhysicsRotate(rotation);
     }
 
     public Vector2 GetPosition()

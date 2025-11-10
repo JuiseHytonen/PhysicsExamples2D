@@ -67,12 +67,14 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
         if (Keyboard.current.rightArrowKey.isPressed)
         {
-            MyTurret.RotateLeft();
+            var rotation = MyTurret.RotateLeft();
+            RpcTest.SendRotateMessageToOthers(rotation);
         }
 
         if (Keyboard.current.leftArrowKey.isPressed)
         {
-            MyTurret.RotateRight();
+            var rotation = MyTurret.RotateRight();
+            RpcTest.SendRotateMessageToOthers(rotation);
         }
 
 
@@ -119,6 +121,11 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         }
     }
 
+    public void RotateOtherTurret(Vector2 rotation)
+    {
+        OtherTurret.SetRotation(rotation);
+    }
+
     public void ShootAtTime(long ticks, bool isMe)
     {
         if (m_startTime == DateTime.MinValue)
@@ -145,8 +152,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private DateTime m_nextShootTime;
     private TimeSpan m_shootDelay = new TimeSpan(0, 0, 1);
 
-    private Turret MyTurret => !RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
-    private Turret OtherTurret => RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
+    private Turret MyTurret => RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
+    private Turret OtherTurret => !RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
 
 
     public void Shoot()
