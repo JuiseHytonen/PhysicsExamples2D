@@ -39,13 +39,13 @@ public class Turret
 
     public Vector2 RotateRight()
     {
-        m_Body.rotation = m_Body.rotation.Rotate(TURRET_ROTATION_SPEED);
+        m_Body.rotation = m_Body.rotation.Rotate(-TURRET_ROTATION_SPEED);
         return m_Body.rotation.direction;
     }
 
     public Vector2 RotateLeft()
     {
-        m_Body.rotation = m_Body.rotation.Rotate(-TURRET_ROTATION_SPEED);
+        m_Body.rotation = m_Body.rotation.Rotate(TURRET_ROTATION_SPEED);
         return m_Body.rotation.direction;
     }
 

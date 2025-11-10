@@ -39,6 +39,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     {
         if (Instance != null)
         {
+            return;
             Destroy(Instance);
         }
         Instance = this;
@@ -78,10 +79,11 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         m_rightButton.SetVisibleInHierarchy(false);
         m_shootButton.SetVisibleInHierarchy(false);
 
-        m_leftButton.RegisterCallback<MouseDownEvent>(evt => m_leftButtonDown = true);
-        m_leftButton.RegisterCallback<MouseUpEvent>(evt => m_leftButtonDown = false);
-        m_rightButton.RegisterCallback<MouseDownEvent>(evt => m_rightButtonDown = true);
-        m_rightButton.RegisterCallback<MouseUpEvent>(evt => m_rightButtonDown = false);
+        m_leftButton.RegisterCallback<MouseDownEvent>(evt => m_leftButtonDown = true, TrickleDown.TrickleDown);
+        m_leftButton.RegisterCallback<MouseUpEvent>(evt => m_leftButtonDown = false, TrickleDown.TrickleDown);
+        m_rightButton.RegisterCallback<MouseDownEvent>(evt => m_rightButtonDown = true, TrickleDown.TrickleDown);
+        m_rightButton.RegisterCallback<MouseUpEvent>(evt => m_rightButtonDown = false, TrickleDown.TrickleDown);
+        m_shootButton.RegisterCallback<MouseUpEvent>(evt => Shoot());
         m_hostButton.RegisterCallback<MouseUpEvent>(OnHostClicked);
         m_clientButton.RegisterCallback<MouseUpEvent>(OnClientClicked);
     }
@@ -122,13 +124,13 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
         if (Keyboard.current.rightArrowKey.isPressed || m_rightButtonDown)
         {
-            var rotation = MyTurret.RotateLeft();
+            var rotation = MyTurret.RotateRight();
             RpcTest.SendRotateMessageToOthers(rotation);
         }
 
         if (Keyboard.current.leftArrowKey.isPressed || m_leftButtonDown)
         {
-            var rotation = MyTurret.RotateRight();
+            var rotation = MyTurret.RotateLeft();
             RpcTest.SendRotateMessageToOthers(rotation);
         }
 
