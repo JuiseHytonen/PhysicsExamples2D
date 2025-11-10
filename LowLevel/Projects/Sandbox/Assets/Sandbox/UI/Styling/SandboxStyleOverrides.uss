@@ -40,12 +40,13 @@ Label {
     margin-top: 2px;
 }
 
-/* Make TabView fill whole window */
-TabView, .unity-tab-view__content-container, Tab, .unity-tab__content-container {
+TabView,
+.unity-tab-view__content-container,
+Tab,
+.unity-tab__content-container {
     flex-grow: 1;
 }
 
-/* By default, each tab header has an underline. This hides the header underline  */
 .unity-tab__header-underline {
     opacity: 0;
 }
@@ -88,4 +89,13 @@ TabView, .unity-tab-view__content-container, Tab, .unity-tab__content-container 
 
 .unity-tab-view__content-viewport {
     background-color: rgba(0, 0, 0, 0);
-} 
+}
+
+.MyTextField > .unity-base-text-field__label {
+    display: none;
+}
+
+.juise-button {
+    height: 90px;
+    width: 90px;
+}
