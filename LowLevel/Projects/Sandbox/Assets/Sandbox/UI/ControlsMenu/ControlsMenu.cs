@@ -96,6 +96,7 @@ public class ControlsMenu : MonoBehaviour
 
     private void OnDisable()
     {
+        return;
         quitButton.Reset();
 
         foreach (var button in m_CustomButtons)

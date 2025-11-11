@@ -61,9 +61,9 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         var world = PhysicsWorld.defaultWorld;
         world.autoContactCallbacks = true;
 
-        SetupOptions();
+        //SetupOptions();
 
-        SetupScene();
+        //SetupScene();
 
         var root = m_UIDocument.rootVisualElement;
         m_leftButton = root.Q<Button>("LeftButton");
