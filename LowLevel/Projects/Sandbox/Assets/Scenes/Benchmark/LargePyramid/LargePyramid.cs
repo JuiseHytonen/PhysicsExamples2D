@@ -63,7 +63,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
         //SetupOptions();
 
-        //SetupScene();
+        SetupScene();
 
         var root = m_UIDocument.rootVisualElement;
         m_leftButton = root.Q<Button>("LeftButton");
@@ -355,6 +355,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
         CreateTurrets();
 
+
         // Ground.
         {
             var groundBody = world.CreateBody(new PhysicsBodyDefinition { position = new Vector2(0f, -1f), bodyType = RigidbodyType2D.Static});
@@ -369,7 +370,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             groundBody.CreateShape(PolygonGeometry.CreateBox(new Vector2(2f, groundLength), radius: 0f, new PhysicsTransform(new Vector2(groundLength * -0.5f, groundLength * 0.5f), PhysicsRotate.identity)), shapeDef);
             groundBody.CreateShape(PolygonGeometry.CreateBox(new Vector2(2f, groundLength), radius: 0f, new PhysicsTransform(new Vector2(groundLength * 0.5f, groundLength * 0.5f), PhysicsRotate.identity)), shapeDef);
         }
-
+        return;
         // Pyramid.
         {
             var bodyDef = new PhysicsBodyDefinition { bodyType = RigidbodyType2D.Dynamic };
