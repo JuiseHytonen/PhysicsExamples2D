@@ -96,7 +96,7 @@ public class CameraManipulator : MonoBehaviour
     private void Awake()
     {
         m_SandboxManager = FindFirstObjectByType<SandboxManager>();
-        Camera = GetComponentInParent<Camera>();
+        Camera = Camera.main;
         CameraPosition = Vector2.zero;
         m_TouchMode = InputMode.Drag;
         CameraZoom = 1f;
@@ -236,7 +236,7 @@ public class CameraManipulator : MonoBehaviour
 
                 // Get the default world.
                 var world = PhysicsWorld.defaultWorld;
-                
+
                 var bodyB = m_DragJoint.bodyB;
                 world.DrawLine(target, bodyB.GetWorldPoint(m_DragJoint.localAnchorB.position), Color.grey);
                 world.DrawLine(oldTarget, target, Color.whiteSmoke);

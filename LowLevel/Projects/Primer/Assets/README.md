@@ -5,6 +5,31 @@ Below will add any extra detail not covered in the examples themselves.
 
 Each example has at least a single "Example" GameObject with an example script which you should examine to understand how the example works.
 The scripts contain short annotation-style comments where appropriate to highlight the functionality.
+Nano games
+----------
+My nano world
+- nice merge game
+- beautiful art, 
+- I found a bug in FTUE/Onboarding: if you tap the key but you don´t click the use button, instead click the person the use button disappears and you cannot get it back without restarting the app because in that FTUE step app would only take tap to use button
+- I think in FTUE it would be good to allow merging to the other direction too, not only to direction the finger animation shows
+
+
+Angry birds friends game had it´s level editor made in old technology, Flash. When making the new Unity-based version I managed to persuade to get rid of intermediate format the old editor used. It created .lua file that was imported into Unity. I noticed many of the things in lua file were manually added, like collider coordinates. This is something that works well in Unity, so when we dropped the intermediate format the tooling for creating colliders became much better without any extra work. Also dropping the unnecessary format made future development simpler.
+
+When I started working as tools programmer in Social First my supervisors did not expect to get results in a month or two but I made a UI Toolkit-based tool for editing the game assets and artists were able to use it after two weeks.
+
+I have worked in a match-3 game Angry Birds Friends that has quite similar FTUE / Onboarding as My Nano world. I´m familiar with making A/B tests.
+
+I have written unit tests, I appreciate communication between programmers and pull requests are a great tool for that. Pull requests are also very effective in reducing bugs. Sometimes programmers are blind to own mistakes.
+
+I have made a DOTS-based reactive data model in a hobby project using c# generics. I think ECS is a great way to organize code, not only it has great performance and memory management.
+
+I have been working on a project using box2d 3.1 introduced in Unity 6.3, it is very good tool.
+
+a structured approach to answering behavioral interview questions by providing a story with four parts: Situation, Task, Action, and Result
+
+
+
 
 <b>Note:</b> Gaps in the example numbering is intentional, leaving space for addition examples to be added.
 

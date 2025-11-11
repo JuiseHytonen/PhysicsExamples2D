@@ -46,14 +46,14 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         m_SandboxManager = FindFirstObjectByType<SandboxManager>();
         m_SceneManifest = FindFirstObjectByType<SceneManifest>();
         m_UIDocument = GetComponent<UIDocument>();
-        m_SandboxManager.SceneOptionsUI = m_UIDocument;
+        //m_SandboxManager.SceneOptionsUI = m_UIDocument;
 
         m_CameraManipulator = FindFirstObjectByType<CameraManipulator>();
-        m_CameraManipulator.CameraSize = 80f;
-        m_CameraManipulator.CameraPosition = new Vector2(0f, 79f);
+      //  m_CameraManipulator.CameraSize = 80f;
+        //m_CameraManipulator.CameraPosition = new Vector2(0f, 79f);
 
         // Set up the scene reset action.
-        m_SandboxManager.SceneResetAction = SetupScene;
+      //  m_SandboxManager.SceneResetAction = SetupScene;
 
         m_BaseCount = 90;
         m_OldGravity = PhysicsWorld.defaultWorld.gravity;
@@ -66,6 +66,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         SetupScene();
 
         var root = m_UIDocument.rootVisualElement;
+
+        m_joinCodeField = root.Q<TextField>("JoinCode");
         m_leftButton = root.Q<Button>("LeftButton");
 
         m_hostButton = root.Q<Button>("HostButton");
@@ -145,6 +147,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     public void OnContactBegin2D(PhysicsEvents.ContactBeginEvent beginEvent)
     {
+        return;
         const float radius = 10f;
         PhysicsWorld.defaultWorld.DrawCircle(beginEvent.shapeB.transform.position, radius, Color.orangeRed, 0.09f, PhysicsWorld.DrawFillOptions.All);
         var explodeDef = new PhysicsWorld.ExplosionDefinition { position = beginEvent.shapeB.transform.position, radius = radius, falloff = 2f, impulsePerLength = 90f };
@@ -234,8 +237,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     private void CreateTurrets()
     {
-        m_leftTurret = new Turret(-100f, 5f);
-        m_rightTurret = new Turret(100f, 5f);
+        m_leftTurret = new Turret(-70f, -40f);
+        m_rightTurret = new Turret(70f, -40f);
     }
 
     private void DoShoot(bool isMe)
@@ -254,7 +257,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             {
                 //contactFilter = new PhysicsShape.ContactFilter { categories = m_ProjectileMask, contacts =  m_DestructibleMask | m_GroundMask },
                 surfaceMaterial = new PhysicsShape.SurfaceMaterial { friction = 0.0f, bounciness = 0.3f },
-                contactEvents = true
+                contactEvents = true,
+                density = 10f
             };
 
             // Fire all the projectiles.
@@ -281,7 +285,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             for (var i = 0; i < 1; ++i)
             {
                 // Create the projectile shape.
-                shapeDef.surfaceMaterial.customColor = m_SandboxManager.ShapeColorState;
+              //  shapeDef.surfaceMaterial.customColor = m_SandboxManager.ShapeColorState;
                 var body = bodies[i];
                 body.callbackTarget = this;
                var shape =  body.CreateShape(capsuleGeometry, shapeDef);
@@ -315,7 +319,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             menuRegion.RegisterCallback<PointerEnterEvent>(_ => ++m_CameraManipulator.OverlapUI);
             menuRegion.RegisterCallback<PointerLeaveEvent>(_ => --m_CameraManipulator.OverlapUI);
 
-            m_joinCodeField = root.Q<TextField>("JoinCode");
+
 
             // Base Count.
             var baseCount = root.Q<SliderInt>("base-count");
@@ -348,7 +352,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private void SetupScene()
     {
         // Reset the scene state.
-        m_SandboxManager.ResetSceneState();
+     //   m_SandboxManager.ResetSceneState();
 
         // Get the default world.
         var world = PhysicsWorld.defaultWorld;
@@ -358,7 +362,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
         // Ground.
         {
-            var groundBody = world.CreateBody(new PhysicsBodyDefinition { position = new Vector2(0f, -1f), bodyType = RigidbodyType2D.Static});
+            var groundBody = world.CreateBody(new PhysicsBodyDefinition { position = new Vector2(0f, -50f), bodyType = RigidbodyType2D.Static});
 
             var shapeDef = new PhysicsShapeDefinition
             {
