@@ -107,6 +107,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         if (code != null)
         {
             ShowMoveButtonsAndHideConnectButtons();
+            m_joinCodeField.value = code;
         }
     }
 
@@ -225,8 +226,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private DateTime m_nextShootTime;
     private TimeSpan m_shootDelay = new TimeSpan(0, 0, 0, 0, 200);
 
-    private Turret MyTurret => m_leftTurret;//RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
-    private Turret OtherTurret => m_leftTurret;//!RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
+    private Turret MyTurret => RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
+    private Turret OtherTurret => !RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
 
 
     public void Shoot()
