@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.LowLevelPhysics;
 using UnityEngine.LowLevelPhysics2D;
 using UnityEngine.UIElements;
 using TimeSpan = System.TimeSpan;
@@ -57,7 +58,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
         m_BaseCount = 90;
         m_OldGravity = PhysicsWorld.defaultWorld.gravity;
-        m_GravityScale = 2f;
+        m_GravityScale = 1f;
         var world = PhysicsWorld.defaultWorld;
         world.autoContactCallbacks = true;
 
@@ -86,8 +87,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         m_rightButton.RegisterCallback<MouseDownEvent>(evt => m_rightButtonDown = true, TrickleDown.TrickleDown);
         m_rightButton.RegisterCallback<MouseUpEvent>(evt => m_rightButtonDown = false, TrickleDown.TrickleDown);
         m_shootButton.RegisterCallback<MouseUpEvent>(evt => Shoot());
-        m_hostButton.RegisterCallback<MouseUpEvent>(OnHostClicked);
-        m_clientButton.RegisterCallback<MouseUpEvent>(OnClientClicked);
+        m_hostButton.RegisterCallback<MouseUpEvent>(OnHostClicked, TrickleDown.TrickleDown);
+        m_clientButton.RegisterCallback<MouseUpEvent>(OnClientClicked, TrickleDown.TrickleDown);
         Debug.developerConsoleEnabled = false;
     }
 
@@ -147,6 +148,17 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     public void OnContactBegin2D(PhysicsEvents.ContactBeginEvent beginEvent)
     {
+        return;
+        if (beginEvent.shapeA.GetDensity() > 99)
+        {
+            beginEvent.shapeA.Destroy();
+        }
+        else
+        {
+            beginEvent.shapeB.Destroy();
+        }
+
+        Debug.Log(DateTime.UtcNow - m_startTime);
         return;
         const float radius = 10f;
         PhysicsWorld.defaultWorld.DrawCircle(beginEvent.shapeB.transform.position, radius, Color.orangeRed, 0.09f, PhysicsWorld.DrawFillOptions.All);
@@ -211,10 +223,10 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     private DateTime m_startTime = DateTime.MinValue;
     private DateTime m_nextShootTime;
-    private TimeSpan m_shootDelay = new TimeSpan(0, 0, 1);
+    private TimeSpan m_shootDelay = new TimeSpan(0, 0, 0, 0, 200);
 
-    private Turret MyTurret => RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
-    private Turret OtherTurret => !RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
+    private Turret MyTurret => m_leftTurret;//RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
+    private Turret OtherTurret => m_leftTurret;//!RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
 
 
     public void Shoot()
@@ -245,12 +257,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     {
               var capsuleRadius = 1;
             var capsuleLength = capsuleRadius;
-            var capsuleGeometry = new CapsuleGeometry
-            {
-                center1 = Vector2.left * (capsuleLength * .5f),
-                center2 = Vector2.right * (capsuleLength * .5f),
-                radius = capsuleRadius
-            };
+            var capsuleGeometry = PolygonGeometry.CreateBox(new Vector2(1, 1));
 
             var bodyDef = new PhysicsBodyDefinition { bodyType = RigidbodyType2D.Dynamic, gravityScale = m_GravityScale, fastCollisionsAllowed = true };
             var shapeDef = new PhysicsShapeDefinition
@@ -258,7 +265,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
                 //contactFilter = new PhysicsShape.ContactFilter { categories = m_ProjectileMask, contacts =  m_DestructibleMask | m_GroundMask },
                 surfaceMaterial = new PhysicsShape.SurfaceMaterial { friction = 0.0f, bounciness = 0.3f },
                 contactEvents = true,
-                density = 10f
+                density = 100f
             };
 
             // Fire all the projectiles.
@@ -268,7 +275,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
                 // Calculate the fire spread.
                 var halfSpread = 1 * 0.5f;
                 var fireDirection = isMe?MyTurret.GetRotation():OtherTurret.GetRotation();
-                var fireSpeed = 50f;
+                var fireSpeed = 90f;
 
                 // Create the projectile body.
                 bodyDef.position = isMe?MyTurret.GetPosition():OtherTurret.GetPosition();
@@ -288,8 +295,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
               //  shapeDef.surfaceMaterial.customColor = m_SandboxManager.ShapeColorState;
                 var body = bodies[i];
                 body.callbackTarget = this;
-               var shape =  body.CreateShape(capsuleGeometry, shapeDef);
-               shape.callbackTarget = this;
+                var shape =  body.CreateShape(capsuleGeometry, shapeDef);
+                shape.callbackTarget = this;
             }
 
             // Dispose.
