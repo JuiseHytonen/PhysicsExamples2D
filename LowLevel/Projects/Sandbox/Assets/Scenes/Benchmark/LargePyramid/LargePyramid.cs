@@ -29,12 +29,15 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private Button m_shootButton;
     private Button m_hostButton;
     private Button m_clientButton;
+    private Button m_resetTimeButton;
+
 
     private bool m_leftButtonDown;
     private bool m_rightButtonDown;
     private int m_BaseCount;
     private Vector2 m_OldGravity;
     private float m_GravityScale;
+    private int m_fixedUpdates = 0;
 
     private void OnEnable()
     {
@@ -75,6 +78,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         m_shootButton = root.Q<Button>("ShootButton");
         m_leftButton = root.Q<Button>("LeftButton");
         m_rightButton = root.Q<Button>("RightButton");
+        m_resetTimeButton = root.Q<Button>("ResetTimeButton");
 
 
         m_leftButton.SetVisibleInHierarchy(false);
@@ -85,6 +89,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         m_leftButton.RegisterCallback<MouseUpEvent>(evt => m_leftButtonDown = false, TrickleDown.TrickleDown);
         m_rightButton.RegisterCallback<MouseDownEvent>(evt => m_rightButtonDown = true, TrickleDown.TrickleDown);
         m_rightButton.RegisterCallback<MouseUpEvent>(evt => m_rightButtonDown = false, TrickleDown.TrickleDown);
+        m_resetTimeButton.RegisterCallback<MouseUpEvent>(evt => m_fixedUpdates = 0, TrickleDown.TrickleDown);
         m_shootButton.RegisterCallback<MouseUpEvent>(evt => Shoot());
         m_hostButton.RegisterCallback<MouseUpEvent>(OnHostClicked, TrickleDown.TrickleDown);
         m_clientButton.RegisterCallback<MouseUpEvent>(OnClientClicked, TrickleDown.TrickleDown);
@@ -184,12 +189,10 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     }
 
-    private int fixedUpdates = 0;
-
     private void FixedUpdate()
     {
-        fixedUpdates++;
-        if (fixedUpdates == m_nextShootTime)
+        m_fixedUpdates++;
+        if (m_fixedUpdates == m_nextShootTime)
         {
             DoShoot(m_nextShootIsMe, m_nextShootAngle);
         }
@@ -230,8 +233,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
       //  {
         //    return;
        // }
-        RpcTest.SendShootMessageToOthers(fixedUpdates + shootDelayFixedUpdates, MyTurret.GetRotation());
-        ShootAtTime(fixedUpdates + shootDelayFixedUpdates, true, MyTurret.GetRotation());
+        RpcTest.SendShootMessageToOthers(m_fixedUpdates + shootDelayFixedUpdates, MyTurret.GetRotation());
+        ShootAtTime(m_fixedUpdates + shootDelayFixedUpdates, true, MyTurret.GetRotation());
     }
 
     private void CreateTurrets()
