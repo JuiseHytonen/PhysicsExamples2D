@@ -5,12 +5,14 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.LowLevelPhysics;
 using UnityEngine.LowLevelPhysics2D;
+using UnityEngine.U2D.Physics.LowLevelExtras;
 using UnityEngine.UIElements;
 using TimeSpan = System.TimeSpan;
 
 public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 {
     public static LargePyramid Instance;
+    [SerializeField] private GameObject m_ball;
     private readonly PhysicsMask m_GroundMask = new(1);
     private readonly PhysicsMask m_DestructibleMask = new(2);
     private readonly PhysicsMask m_ProjectileMask = new(3);
@@ -96,12 +98,25 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         Debug.developerConsoleEnabled = false;
     }
 
+    public async void ResetTime(bool useDelay)
+    {
+        if (useDelay)
+        {
+            await Task.Delay(100);
+        }
+       // m_ball.GetComponent<SceneDistanceJoint>().
+       m_fixedUpdates = 0;
+    }
+
+
     private async void OnClientClicked(MouseUpEvent evt)
     {
         var success = await RelayHelper.Instance.StartClientWithRelay(GetJoinCode());
         if (success)
         {
             ShowMoveButtonsAndHideConnectButtons();
+            RpcTest.Instance.SendResetRpc();
+            ResetTime(true);
         }
     }
 

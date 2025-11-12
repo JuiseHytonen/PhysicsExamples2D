@@ -8,6 +8,10 @@ public class RpcTest : NetworkBehaviour
 
     public void Start()
     {
+        if (Instance != null)
+        {
+            Destroy(Instance);
+        }
         Instance = this;
     }
     public override void OnNetworkSpawn()
@@ -38,6 +42,12 @@ public class RpcTest : NetworkBehaviour
     public static void SendShootMessageToOthers(int frames, Vector2 rotation)
     {
         Instance?.SendShootMessageToOthersRpc(frames, rotation, Instance.NetworkObjectId);
+    }
+
+    [Rpc(SendTo.NotMe)]
+    public void SendResetRpc()
+    {
+        LargePyramid.Instance.ResetTime(false);
     }
 
     [Rpc(SendTo.NotMe)]

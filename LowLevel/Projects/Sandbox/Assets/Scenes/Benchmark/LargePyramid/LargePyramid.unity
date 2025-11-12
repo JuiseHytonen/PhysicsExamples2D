@@ -1037,6 +1037,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 098f7cab574c22442bff317cc63b1f84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_ball: {fileID: 0}
 --- !u!1001 &566412848
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1107,10 +1108,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8119582789951832575, guid: 29c749147897367459ed2a48cb845332, type: 3}
       propertyPath: BodyDefinition.m_Position.x
-      value: -5.542
+      value: -11.084
       objectReference: {fileID: 0}
     - target: {fileID: 8119582789951832575, guid: 29c749147897367459ed2a48cb845332, type: 3}
       propertyPath: BodyDefinition.m_Position.y
+      value: 32.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8119582789951832575, guid: 29c749147897367459ed2a48cb845332, type: 3}
+      propertyPath: BodyDefinition.m_AngularVelocity
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -2619,6 +2624,14 @@ PrefabInstance:
       propertyPath: BodyA
       value: 
       objectReference: {fileID: 880298015}
+    - target: {fileID: 526457324046368919, guid: 87e437132b54e57498837440a48dc22d, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 526457324046368919, guid: 87e437132b54e57498837440a48dc22d, type: 3}
+      propertyPath: JointDefinition.m_EnableSpring
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 904644473972779726, guid: 87e437132b54e57498837440a48dc22d, type: 3}
       propertyPath: m_Name
       value: Ball
@@ -2679,13 +2692,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4974205578637844923, guid: 87e437132b54e57498837440a48dc22d, type: 3}
+      propertyPath: ScaleRadius
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9186877601215590714, guid: 87e437132b54e57498837440a48dc22d, type: 3}
       propertyPath: BodyDefinition.m_Position.x
-      value: 8.542
+      value: 17.084
       objectReference: {fileID: 0}
     - target: {fileID: 9186877601215590714, guid: 87e437132b54e57498837440a48dc22d, type: 3}
       propertyPath: BodyDefinition.m_Position.y
-      value: 0
+      value: 32.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9186877601215590714, guid: 87e437132b54e57498837440a48dc22d, type: 3}
+      propertyPath: BodyDefinition.m_FastCollisionsAllowed
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
