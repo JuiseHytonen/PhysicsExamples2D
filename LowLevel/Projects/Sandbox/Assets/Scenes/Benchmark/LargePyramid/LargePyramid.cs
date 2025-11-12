@@ -40,7 +40,6 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     {
         if (Instance != null)
         {
-            return;
             Destroy(Instance);
         }
         Instance = this;
@@ -226,6 +225,11 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     public void Shoot()
     {
+        // Don´t allow shooting if another shot is pending
+    //    if (m_nextShootTime > fixedUpdates)
+      //  {
+        //    return;
+       // }
         RpcTest.SendShootMessageToOthers(fixedUpdates + shootDelayFixedUpdates, MyTurret.GetRotation());
         ShootAtTime(fixedUpdates + shootDelayFixedUpdates, true, MyTurret.GetRotation());
     }
@@ -238,6 +242,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     private void DoShoot(bool isMe, Vector2 rotation)
     {
+            m_nextShootTime = 0;
               var capsuleRadius = 1;
             var capsuleLength = capsuleRadius;
             var capsuleGeometry = PolygonGeometry.CreateBox(new Vector2(1, 1));
