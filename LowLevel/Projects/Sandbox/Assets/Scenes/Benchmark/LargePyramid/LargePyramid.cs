@@ -200,7 +200,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         OtherTurret.SetRotation(rotation);
     }
 
-    public void ShootAtTime(long ticks, bool isMe)
+    public void ShootAtTime(long ticks, bool isMe, Vector2 rotation)
     {
         if (m_startTime == DateTime.MinValue)
         {
@@ -209,17 +209,17 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
         var ticksTimeSpan = new TimeSpan(ticks);
         var timeSpan = m_startTime -DateTime.UtcNow + ticksTimeSpan;
-        ShootAfter((int)timeSpan.TotalMilliseconds, isMe);
+        ShootAfter((int)timeSpan.TotalMilliseconds, isMe, rotation);
         //Invoke(nameof(DoShoot), (float)timeSpan.TotalMilliseconds / 1000f);
         //m_nextShootTime = m_startTime + new TimeSpan(ticks);
     }
 
-    private async void ShootAfter(int msDelay, bool isMe)
+    private async void ShootAfter(int msDelay, bool isMe, Vector2 rotation)
     {
         await Task.Delay(msDelay);
         Debug.Log("delay " + msDelay);
        // ShootAfter(1000);
-        DoShoot(isMe);
+        DoShoot(isMe, rotation);
     }
 
     private DateTime m_startTime = DateTime.MinValue;
@@ -235,15 +235,15 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
         if (m_startTime == DateTime.MinValue)
         {
-            RpcTest.SendShootMessageToOthers(m_shootDelay.Ticks);
+            RpcTest.SendShootMessageToOthers(m_shootDelay.Ticks, MyTurret.GetRotation());
             //m_startTime = DateTime.UtcNow;
-            ShootAtTime(m_shootDelay.Ticks, true);
+            ShootAtTime(m_shootDelay.Ticks, true, MyTurret.GetRotation());
         }
         else
         {
             var ticks = (DateTime.UtcNow - m_startTime + m_shootDelay).Ticks;
-            RpcTest.SendShootMessageToOthers(ticks);
-            ShootAtTime(ticks, true);
+            RpcTest.SendShootMessageToOthers(ticks, MyTurret.GetRotation());
+            ShootAtTime(ticks, true, MyTurret.GetRotation());
         }
     }
 
@@ -254,7 +254,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         m_rightTurret = new Turret(70f, -40f);
     }
 
-    private void DoShoot(bool isMe)
+    private void DoShoot(bool isMe, Vector2 rotation)
     {
               var capsuleRadius = 1;
             var capsuleLength = capsuleRadius;
@@ -275,7 +275,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             {
                 // Calculate the fire spread.
                 var halfSpread = 1 * 0.5f;
-                var fireDirection = isMe?MyTurret.GetRotation():OtherTurret.GetRotation();
+                var fireDirection = rotation;
                 var fireSpeed = 90f;
 
                 // Create the projectile body.

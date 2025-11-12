@@ -35,15 +35,15 @@ public class RpcTest : NetworkBehaviour
         ClientAndHostRpc(value, sourceNetworkObjectId);
     }
 
-    public static void SendShootMessageToOthers(long ticks)
+    public static void SendShootMessageToOthers(long ticks, Vector2 rotation)
     {
-        Instance?.SendShootMessageToOthersRpc(ticks, Instance.NetworkObjectId);
+        Instance?.SendShootMessageToOthersRpc(ticks, rotation, Instance.NetworkObjectId);
     }
 
     [Rpc(SendTo.NotMe)]
-    private void SendShootMessageToOthersRpc(long ticks, ulong id)
+    private void SendShootMessageToOthersRpc(long ticks, Vector2 rotation, ulong id)
     {
-        LargePyramid.Instance.ShootAtTime(ticks, false);
+        LargePyramid.Instance.ShootAtTime(ticks, false, rotation);
     }
 
     public static void SendRotateMessageToOthers(Vector2 rotation)
