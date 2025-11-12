@@ -159,7 +159,6 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             beginEvent.shapeB.Destroy();
         }
 
-        Debug.Log(DateTime.UtcNow - m_startTime);
         return;
         const float radius = 10f;
         PhysicsWorld.defaultWorld.DrawCircle(beginEvent.shapeB.transform.position, radius, Color.orangeRed, 0.09f, PhysicsWorld.DrawFillOptions.All);
@@ -191,15 +190,9 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private void FixedUpdate()
     {
         fixedUpdates++;
-        if (fixedUpdates % 50 == 10)
+        if (fixedUpdates == m_nextShootTime)
         {
-            DoShoot(true, Vector2.right);
-        }
-
-        if (m_nextShootTime != DateTime.MinValue && m_nextShootTime <= DateTime.UtcNow)
-        {
-        //    DoShoot();
-         //   m_nextShootTime = DateTime.MinValue;
+            DoShoot(m_nextShootIsMe, m_nextShootAngle);
         }
     }
 
@@ -208,51 +201,33 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         OtherTurret.SetRotation(rotation);
     }
 
-    public void ShootAtTime(long ticks, bool isMe, Vector2 rotation)
+    public void ShootAtTime(int fixedUpdates, bool isMe, Vector2 rotation)
     {
-        if (m_startTime == DateTime.MinValue)
-        {
-            m_startTime = DateTime.UtcNow;
-        }
-
-        var ticksTimeSpan = new TimeSpan(ticks);
-        var timeSpan = m_startTime -DateTime.UtcNow + ticksTimeSpan;
-        ShootAfter((int)timeSpan.TotalMilliseconds, isMe, rotation);
-        //Invoke(nameof(DoShoot), (float)timeSpan.TotalMilliseconds / 1000f);
-        //m_nextShootTime = m_startTime + new TimeSpan(ticks);
+        m_nextShootIsMe = isMe;
+        m_nextShootAngle = rotation;
+        m_nextShootTime = fixedUpdates;
     }
 
     private async void ShootAfter(int msDelay, bool isMe, Vector2 rotation)
     {
         await Task.Delay(msDelay);
         Debug.Log("delay " + msDelay);
-       // ShootAfter(1000);
         DoShoot(isMe, rotation);
     }
 
-    private DateTime m_startTime = DateTime.MinValue;
-    private DateTime m_nextShootTime;
-    private TimeSpan m_shootDelay = new TimeSpan(0, 0, 0, 0, 200);
+    private bool m_nextShootIsMe;
+    private int m_nextShootTime;
+    private Vector2 m_nextShootAngle;
+    private int shootDelayFixedUpdates = 100;
 
-    private Turret MyTurret => m_leftTurret;//RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
+    private Turret MyTurret => RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
     private Turret OtherTurret => !RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
 
 
     public void Shoot()
     {
-
-        if (m_startTime == DateTime.MinValue)
-        {
-            RpcTest.SendShootMessageToOthers(m_shootDelay.Ticks, MyTurret.GetRotation());
-            //m_startTime = DateTime.UtcNow;
-            ShootAtTime(m_shootDelay.Ticks, true, MyTurret.GetRotation());
-        }
-        else
-        {
-            var ticks = (DateTime.UtcNow - m_startTime + m_shootDelay).Ticks;
-            RpcTest.SendShootMessageToOthers(ticks, MyTurret.GetRotation());
-            ShootAtTime(ticks, true, MyTurret.GetRotation());
-        }
+        RpcTest.SendShootMessageToOthers(fixedUpdates + shootDelayFixedUpdates, MyTurret.GetRotation());
+        ShootAtTime(fixedUpdates + shootDelayFixedUpdates, true, MyTurret.GetRotation());
     }
 
     private void CreateTurrets()
