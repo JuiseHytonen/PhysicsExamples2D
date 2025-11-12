@@ -263,7 +263,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             var shapeDef = new PhysicsShapeDefinition
             {
                 //contactFilter = new PhysicsShape.ContactFilter { categories = m_ProjectileMask, contacts =  m_DestructibleMask | m_GroundMask },
-                surfaceMaterial = new PhysicsShape.SurfaceMaterial { friction = 0.0f, bounciness = 0.3f },
+                surfaceMaterial = new PhysicsShape.SurfaceMaterial { friction = 1f, bounciness = 0.3f },
                 contactEvents = true,
                 density = 100f
             };
@@ -374,6 +374,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             var shapeDef = new PhysicsShapeDefinition
             {
               //  contactFilter = new PhysicsShape.ContactFilter { categories = m_GroundMask, contacts = m_ProjectileMask | m_DestructibleMask },
+              surfaceMaterial = new PhysicsShape.SurfaceMaterial { friction = 1f, bounciness = 0.3f }
             };
             const float groundLength = 1000f;
             groundBody.CreateShape(PolygonGeometry.CreateBox(new Vector2(groundLength, 2f)), shapeDef);
