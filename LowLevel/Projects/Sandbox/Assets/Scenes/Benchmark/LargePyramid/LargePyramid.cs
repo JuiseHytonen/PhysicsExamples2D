@@ -218,7 +218,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private bool m_nextShootIsMe;
     private int m_nextShootTime;
     private Vector2 m_nextShootAngle;
-    private int shootDelayFixedUpdates = 100;
+    private int shootDelayFixedUpdates = 40;
 
     private Turret MyTurret => RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
     private Turret OtherTurret => !RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
