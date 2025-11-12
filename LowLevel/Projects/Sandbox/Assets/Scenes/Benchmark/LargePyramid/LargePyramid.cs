@@ -186,8 +186,16 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     }
 
+    private int fixedUpdates = 0;
+
     private void FixedUpdate()
     {
+        fixedUpdates++;
+        if (fixedUpdates % 50 == 10)
+        {
+            DoShoot(true, Vector2.right);
+        }
+
         if (m_nextShootTime != DateTime.MinValue && m_nextShootTime <= DateTime.UtcNow)
         {
         //    DoShoot();
@@ -226,7 +234,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private DateTime m_nextShootTime;
     private TimeSpan m_shootDelay = new TimeSpan(0, 0, 0, 0, 200);
 
-    private Turret MyTurret => RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
+    private Turret MyTurret => m_leftTurret;//RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
     private Turret OtherTurret => !RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
 
 
@@ -246,7 +254,6 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             ShootAtTime(ticks, true, MyTurret.GetRotation());
         }
     }
-
 
     private void CreateTurrets()
     {
