@@ -19,6 +19,9 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private Button m_hostButton;
     private Button m_clientButton;
     private Button m_resetTimeButton;
+    private Button m_leftMana;
+    private Button m_rightMana;
+
 
 
     private bool m_leftButtonDown;
@@ -63,7 +66,10 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         m_leftButton = root.Q<Button>("LeftButton");
         m_rightButton = root.Q<Button>("RightButton");
         m_resetTimeButton = root.Q<Button>("ResetTimeButton");
-
+        m_leftMana = root.Q<Button>("LeftMana");
+        m_rightMana = root.Q<Button>("RightMana");
+        m_leftMana.text = "10";
+        m_rightMana.text = "10";
 
         m_leftButton.SetVisibleInHierarchy(false);
         m_rightButton.SetVisibleInHierarchy(false);
