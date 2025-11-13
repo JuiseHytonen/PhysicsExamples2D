@@ -5,7 +5,7 @@ public class Turret
 {
     private const float TURRET_ROTATION_SPEED = .030f;
     private PhysicsBody m_Body;
-    public Turret(float posX, float posY)
+    public Turret(float posX, float posY, Vector2 direction)
     {
            var capsuleRadius = 1;
             var capsuleLength = capsuleRadius * 6;
@@ -13,7 +13,7 @@ public class Turret
             {
                 center1 = Vector2.zero,
                 center2 = Vector2.right * capsuleLength,
-                radius = capsuleRadius
+                radius = capsuleRadius,
             };
 
             var bodyDef = new PhysicsBodyDefinition { bodyType = RigidbodyType2D.Static, gravityScale = 0, fastCollisionsAllowed = false };
@@ -26,7 +26,7 @@ public class Turret
             };
 
             bodyDef.position = new Vector2(posX, posY);
-            bodyDef.rotation = new PhysicsRotate(0f);
+            bodyDef.rotation = new PhysicsRotate(direction);
 
 
 

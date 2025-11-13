@@ -96,6 +96,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         if (success)
         {
             ShowMoveButtonsAndHideConnectButtons();
+            await Task.Delay(200);
             RpcTest.Instance.SendResetRpc();
             ResetTime(true);
         }
@@ -130,13 +131,13 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         if (Keyboard.current.rightArrowKey.isPressed || m_rightButtonDown)
         {
             var rotation = MyTurret.RotateRight();
-            RpcTest.SendRotateMessageToOthers(rotation);
+            RpcTest.Instance.SendRotateMessageToOthersRpc(rotation);
         }
 
         if (Keyboard.current.leftArrowKey.isPressed || m_leftButtonDown)
         {
             var rotation = MyTurret.RotateLeft();
-            RpcTest.SendRotateMessageToOthers(rotation);
+            RpcTest.Instance.SendRotateMessageToOthersRpc(rotation);
         }
 
 
@@ -187,14 +188,14 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
       //  {
         //    return;
        // }
-        RpcTest.SendShootMessageToOthers(m_fixedUpdates + shootDelayFixedUpdates, MyTurret.GetRotation());
+        RpcTest.Instance.SendShootMessageToOthersRpc(m_fixedUpdates + shootDelayFixedUpdates, MyTurret.GetRotation());
         ShootAtTime(m_fixedUpdates + shootDelayFixedUpdates, true, MyTurret.GetRotation());
     }
 
     private void CreateTurrets()
     {
-        m_leftTurret = new Turret(-70f, -40f);
-        m_rightTurret = new Turret(70f, -40f);
+        m_leftTurret = new Turret(-70f, -40f, Vector2.right);
+        m_rightTurret = new Turret(70f, -40f, Vector2.left);
     }
 
     private void DoShoot(bool isMe, Vector2 rotation)
