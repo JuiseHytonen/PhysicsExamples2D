@@ -184,10 +184,10 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     public void Shoot()
     {
         // Don´t allow shooting if another shot is pending
-    //    if (m_nextShootTime > fixedUpdates)
-      //  {
-        //    return;
-       // }
+        if (m_nextShootTime > 0)
+        {
+            return;
+        }
         RpcTest.Instance.SendShootMessageToOthersRpc(m_fixedUpdates + shootDelayFixedUpdates, MyTurret.GetRotation());
         ShootAtTime(m_fixedUpdates + shootDelayFixedUpdates, true, MyTurret.GetRotation());
     }
