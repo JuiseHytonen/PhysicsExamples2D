@@ -41,6 +41,14 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private float m_GravityScale;
     private int m_fixedUpdates = 0;
 
+    private bool m_nextShootIsMe;
+    private int m_nextShootTime;
+    private Vector2 m_nextShootAngle;
+    private int shootDelayFixedUpdates = 50;
+
+    private Turret MyTurret => RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
+    private Turret OtherTurret => !RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
+
     private void OnEnable()
     {
         if (Instance != null)
@@ -51,14 +59,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         m_SandboxManager = FindFirstObjectByType<SandboxManager>();
         m_SceneManifest = FindFirstObjectByType<SceneManifest>();
         m_UIDocument = GetComponent<UIDocument>();
-        //m_SandboxManager.SceneOptionsUI = m_UIDocument;
-
         m_CameraManipulator = FindFirstObjectByType<CameraManipulator>();
-      //  m_CameraManipulator.CameraSize = 80f;
-        //m_CameraManipulator.CameraPosition = new Vector2(0f, 79f);
-
-        // Set up the scene reset action.
-      //  m_SandboxManager.SceneResetAction = SetupScene;
 
         m_BaseCount = 90;
         m_OldGravity = PhysicsWorld.defaultWorld.gravity;
@@ -168,33 +169,6 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     public void OnContactBegin2D(PhysicsEvents.ContactBeginEvent beginEvent)
     {
-        return;
-        if (beginEvent.shapeA.GetDensity() > 99)
-        {
-            beginEvent.shapeA.Destroy();
-        }
-        else
-        {
-            beginEvent.shapeB.Destroy();
-        }
-
-        return;
-        const float radius = 10f;
-        PhysicsWorld.defaultWorld.DrawCircle(beginEvent.shapeB.transform.position, radius, Color.orangeRed, 0.09f, PhysicsWorld.DrawFillOptions.All);
-        var explodeDef = new PhysicsWorld.ExplosionDefinition { position = beginEvent.shapeB.transform.position, radius = radius, falloff = 2f, impulsePerLength = 90f };
-
-        // Explode in all the worlds.
-        using var worlds = PhysicsWorld.GetWorlds();
-        foreach (var world in worlds)
-            world.Explode(explodeDef);
-        if (beginEvent.shapeA.body.bodyType != RigidbodyType2D.Static)
-        {
-            beginEvent.shapeA.Destroy();
-        }
-        if (beginEvent.shapeB.body.bodyType != RigidbodyType2D.Static)
-        {
-            beginEvent.shapeB.Destroy();
-        }
 
     }
 
@@ -220,6 +194,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     public void ShootAtTime(int fixedUpdates, bool isMe, Vector2 rotation)
     {
+        if(!isMe) Debug.Log("shoot message from other " + fixedUpdates +" vs " + m_fixedUpdates);
         m_nextShootIsMe = isMe;
         m_nextShootAngle = rotation;
         m_nextShootTime = fixedUpdates;
@@ -231,15 +206,6 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         Debug.Log("delay " + msDelay);
         DoShoot(isMe, rotation);
     }
-
-    private bool m_nextShootIsMe;
-    private int m_nextShootTime;
-    private Vector2 m_nextShootAngle;
-    private int shootDelayFixedUpdates = 40;
-
-    private Turret MyTurret => RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
-    private Turret OtherTurret => !RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
-
 
     public void Shoot()
     {
