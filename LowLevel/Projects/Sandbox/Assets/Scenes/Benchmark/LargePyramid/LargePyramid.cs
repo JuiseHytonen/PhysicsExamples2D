@@ -1,29 +1,16 @@
-using System;
 using System.Threading.Tasks;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.LowLevelPhysics;
 using UnityEngine.LowLevelPhysics2D;
-using UnityEngine.U2D.Physics.LowLevelExtras;
 using UnityEngine.UIElements;
-using TimeSpan = System.TimeSpan;
 
 public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 {
     public static LargePyramid Instance;
-    [SerializeField] private GameObject m_ball;
-    private readonly PhysicsMask m_GroundMask = new(1);
-    private readonly PhysicsMask m_DestructibleMask = new(2);
-    private readonly PhysicsMask m_ProjectileMask = new(3);
     private Turret m_leftTurret;
     private Turret m_rightTurret;
-
-
-    private SandboxManager m_SandboxManager;
-    private SceneManifest m_SceneManifest;
     private UIDocument m_UIDocument;
-    private CameraManipulator m_CameraManipulator;
     private PhysicsShape.ContactFilter m_DestructibleContactFilter;
     private TextField m_joinCodeField;
     private Button m_leftButton;
@@ -56,18 +43,12 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             Destroy(Instance);
         }
         Instance = this;
-        m_SandboxManager = FindFirstObjectByType<SandboxManager>();
-        m_SceneManifest = FindFirstObjectByType<SceneManifest>();
         m_UIDocument = GetComponent<UIDocument>();
-        m_CameraManipulator = FindFirstObjectByType<CameraManipulator>();
-
         m_BaseCount = 90;
         m_OldGravity = PhysicsWorld.defaultWorld.gravity;
         m_GravityScale = 1f;
         var world = PhysicsWorld.defaultWorld;
         world.autoContactCallbacks = true;
-
-        //SetupOptions();
 
         SetupScene();
 
@@ -105,8 +86,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         {
             await Task.Delay(100);
         }
-       // m_ball.GetComponent<SceneDistanceJoint>().
-       m_fixedUpdates = 0;
+        m_fixedUpdates = 0;
     }
 
 
@@ -200,13 +180,6 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         m_nextShootTime = fixedUpdates;
     }
 
-    private async void ShootAfter(int msDelay, bool isMe, Vector2 rotation)
-    {
-        await Task.Delay(msDelay);
-        Debug.Log("delay " + msDelay);
-        DoShoot(isMe, rotation);
-    }
-
     public void Shoot()
     {
         // Don´t allow shooting if another shot is pending
@@ -288,56 +261,11 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         return m_joinCodeField.value;
     }
 
-    private void SetupOptions()
-    {
-        var root = m_UIDocument.rootVisualElement;
-
-        {
-            // Menu Region (for camera manipulator).
-            var menuRegion = root.Q<VisualElement>("menu-region");
-            menuRegion.RegisterCallback<PointerEnterEvent>(_ => ++m_CameraManipulator.OverlapUI);
-            menuRegion.RegisterCallback<PointerLeaveEvent>(_ => --m_CameraManipulator.OverlapUI);
-
-
-
-            // Base Count.
-            var baseCount = root.Q<SliderInt>("base-count");
-            baseCount.value = m_BaseCount;
-            baseCount.RegisterValueChangedCallback(evt =>
-            {
-                m_BaseCount = evt.newValue;
-                SetupScene();
-            });
-
-            // Gravity Scale.
-            var gravityScale = root.Q<Slider>("gravity-scale");
-            gravityScale.value = m_GravityScale;
-            gravityScale.RegisterValueChangedCallback(evt =>
-            {
-                m_GravityScale = evt.newValue;
-
-                // Get the default world.
-                var world = PhysicsWorld.defaultWorld;
-
-                world.gravity = m_OldGravity * m_GravityScale;
-            });
-
-            // Fetch the scene description.
-            var sceneDescription = root.Q<Label>("scene-description");
-            sceneDescription.text = $"\"{m_SceneManifest.LoadedSceneName}\"\n{m_SceneManifest.LoadedSceneDescription}";
-        }
-    }
-
     private void SetupScene()
     {
-        // Reset the scene state.
-     //   m_SandboxManager.ResetSceneState();
-
-        // Get the default world.
         var world = PhysicsWorld.defaultWorld;
 
         CreateTurrets();
-
 
         // Ground.
         {
@@ -380,8 +308,6 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
                     bodyDef.position = new Vector2(x, y);
                     var body = world.CreateBody(bodyDef);
-
-                    shapeDef.surfaceMaterial.customColor = m_SandboxManager.ShapeColorState;
                     body.CreateShape(boxGeometry, shapeDef);
                 }
             }
