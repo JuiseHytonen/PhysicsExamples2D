@@ -5,11 +5,18 @@ public class ManaCounter
     private const int MAX_MANA = 10;
     private int m_manaValue = 0;
     private Button m_manaButton;
+    private IVisualElementScheduledItem m_scheduledItem;
 
     public ManaCounter(Button manaButton)
     {
         m_manaButton = manaButton;
-        m_manaButton.schedule.Execute(OnManaUpdate).Every(700);
+        m_scheduledItem = m_manaButton.schedule.Execute(OnManaUpdate).Every(700);
+    }
+
+    public void SetWinnerText(string value)
+    {
+        m_scheduledItem.Pause();
+        m_manaButton.text = value;
     }
 
     public bool HasManaAtLeast(int value)

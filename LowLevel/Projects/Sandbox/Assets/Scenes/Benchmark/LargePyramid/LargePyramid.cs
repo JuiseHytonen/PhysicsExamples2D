@@ -164,9 +164,21 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     public void OnContactBegin2D(PhysicsEvents.ContactBeginEvent beginEvent)
     {
+        if (IsObjective(beginEvent.shapeA) || IsObjective(beginEvent.shapeB))
+        {
+            var projectile = IsObjective(beginEvent.shapeA) ? beginEvent.shapeB : beginEvent.shapeA;
+            var winnerIsMe = projectile.userData.intValue == (int)PhysicsObjectType.OwnProjectile;
+            var winnerManaCounter = winnerIsMe ? MyManaCounter : OtherManaCounter;
+            var loserManaCounter = !winnerIsMe ? MyManaCounter : OtherManaCounter;
+            winnerManaCounter.SetWinnerText("WINNER!");
+            loserManaCounter.SetWinnerText("LOSER!");
+        }
 
+        bool IsObjective(PhysicsShape shape)
+        {
+            return shape.userData.intValue == (int)PhysicsObjectType.Objective;
+        }
     }
-
 
     public void OnContactEnd2D(PhysicsEvents.ContactEndEvent endEvent)
     {
@@ -265,9 +277,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         // Create the capsules.
         for (var i = 0; i < 1; ++i)
         {
-            // Create the projectile shape.
-          //  shapeDef.surfaceMaterial.customColor = m_SandboxManager.ShapeColorState;
             var body = bodies[i];
+            body.userData = new PhysicsUserData() { intValue = isMe ? (int)PhysicsObjectType.OwnProjectile : (int)PhysicsObjectType.OthersProjectile };
             body.callbackTarget = this;
             var shape =  body.CreateShape(capsuleGeometry, shapeDef);
             shape.callbackTarget = this;
