@@ -25,5 +25,6 @@
     <ui:VisualElement name="mana_and_stuff" picking-mode="Ignore" style="width: 100%; height: 100%; align-items: flex-start; justify-content: flex-start; align-content: auto; padding-left: 8px; padding-bottom: 8px; position: absolute;">
         <ui:Button text="1" name="LeftMana" emoji-fallback-support="false" parse-escape-sequences="true" class="juise-button"/>
         <ui:Button text="1" name="RightMana" emoji-fallback-support="false" parse-escape-sequences="true" class="juise-button" style="align-self: flex-end; position: absolute;"/>
+        <ui:Label text="Not enough mana!" parse-escape-sequences="true" name="NotEnoughMana" style="position: absolute; align-self: center; font-size: 25px; -unity-font-style: bold; color: rgb(255, 255, 255); margin-top: 14px;"/>
     </ui:VisualElement>
 </ui:UXML>

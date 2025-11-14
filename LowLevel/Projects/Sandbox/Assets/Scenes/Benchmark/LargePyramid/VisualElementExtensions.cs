@@ -6,4 +6,10 @@ public static class VisualElementExtensions
     {
         element.style.display = value ? DisplayStyle.Flex : DisplayStyle.None;
     }
+
+    public static void ShowForMilliSeconds(this VisualElement element, int milliSeconds)
+    {
+        element.SetVisibleInHierarchy(true);
+        element.schedule.Execute(evt => element.SetVisibleInHierarchy(false)).ExecuteLater(milliSeconds);
+    }
 }

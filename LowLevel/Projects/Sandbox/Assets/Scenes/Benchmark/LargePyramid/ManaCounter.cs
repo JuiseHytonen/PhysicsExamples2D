@@ -12,6 +12,11 @@ public class ManaCounter
         m_manaButton.schedule.Execute(OnManaUpdate).Every(700);
     }
 
+    public bool HasManaAtLeast(int value)
+    {
+        return m_manaValue >= value;
+    }
+
     public void ReduceMana(int deduction)
     {
         m_manaValue -= deduction;

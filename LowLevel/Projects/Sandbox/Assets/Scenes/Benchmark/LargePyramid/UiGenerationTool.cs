@@ -203,11 +203,11 @@ public static class UIGenerationTool
 			{
 				if (isMemberReferencing)
 				{
-					toClipboard += $"\tprivate {elementTypeName} {ToCamelCase(elementName)};\n";
+					toClipboard += $"\tprivate {elementTypeName} m_{ToCamelCase(elementName)};\n";
 				}
 				else
 				{
-					toClipboard += $"\t\tthis.{ToCamelCase(elementName)} = this.myVisualElement.Q<{elementTypeName}>(\"{elementName}\");\n";
+					toClipboard += $"\t\tm_{ToCamelCase(elementName)} = root.Q<{elementTypeName}>(\"{elementName}\");\n";
 				}
 			}
 			if (onlyFirstElement)

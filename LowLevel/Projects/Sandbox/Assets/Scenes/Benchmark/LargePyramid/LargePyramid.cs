@@ -22,6 +22,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private Button m_resetTimeButton;
     private Button m_leftManaElement;
     private Button m_rightManaElement;
+    private Label m_notEnoughMana;
+
     private ManaCounter m_leftManaCounter;
     private ManaCounter m_rightManaCounter;
 
@@ -70,8 +72,11 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         m_leftButton = root.Q<Button>("LeftButton");
         m_rightButton = root.Q<Button>("RightButton");
         m_resetTimeButton = root.Q<Button>("ResetTimeButton");
+
         m_leftManaElement = root.Q<Button>("LeftMana");
         m_rightManaElement = root.Q<Button>("RightMana");
+        m_notEnoughMana = root.Q<Label>("NotEnoughMana");
+        m_notEnoughMana.SetVisibleInHierarchy(false);
         m_leftManaCounter = new ManaCounter(m_leftManaElement);
         m_rightManaCounter = new ManaCounter(m_rightManaElement);
         m_leftButton.SetVisibleInHierarchy(false);
@@ -192,7 +197,13 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     public void Shoot()
     {
-        // Don´t allow shooting if another shot is pending
+        if (!MyManaCounter.HasManaAtLeast(DEFAULT_SHOT_MANA_REDUCTION))
+        {
+            m_notEnoughMana.ShowForMilliSeconds(1000);
+            return;
+        }
+        m_notEnoughMana.SetVisibleInHierarchy(false);
+        // Don´t allow shooting if another shot is pending. This will become obsolete as multiple queue is implemented
         if (m_nextShootTime > 0)
         {
             return;
