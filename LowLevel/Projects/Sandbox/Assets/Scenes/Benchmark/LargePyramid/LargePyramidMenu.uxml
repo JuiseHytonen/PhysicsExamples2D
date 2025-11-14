@@ -26,5 +26,6 @@
         <ui:Button text="1" name="LeftMana" emoji-fallback-support="false" parse-escape-sequences="true" class="juise-button"/>
         <ui:Button text="1" name="RightMana" emoji-fallback-support="false" parse-escape-sequences="true" class="juise-button" style="align-self: flex-end; position: absolute;"/>
         <ui:Label text="Not enough mana!" parse-escape-sequences="true" name="NotEnoughMana" style="position: absolute; align-self: center; font-size: 25px; -unity-font-style: bold; color: rgb(255, 255, 255); margin-top: 14px;"/>
+        <ui:Button text="Restart" name="RestartButton" emoji-fallback-support="false" parse-escape-sequences="true" class="juise-button" style="align-self: center; position: absolute; align-items: stretch; height: 30px;"/>
     </ui:VisualElement>
 </ui:UXML>

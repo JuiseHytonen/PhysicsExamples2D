@@ -3,6 +3,7 @@ using Unity.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.LowLevelPhysics2D;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
@@ -23,6 +24,9 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private Button m_leftManaElement;
     private Button m_rightManaElement;
     private Label m_notEnoughMana;
+    private Button m_restartButton;
+
+
 
     private ManaCounter m_leftManaCounter;
     private ManaCounter m_rightManaCounter;
@@ -51,6 +55,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         {
             Destroy(Instance);
         }
+        DontDestroyOnLoad(this.transform);
         Instance = this;
         m_UIDocument = GetComponent<UIDocument>();
         m_BaseCount = 90;
@@ -72,6 +77,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         m_leftButton = root.Q<Button>("LeftButton");
         m_rightButton = root.Q<Button>("RightButton");
         m_resetTimeButton = root.Q<Button>("ResetTimeButton");
+        m_restartButton = root.Q<Button>("RestartButton");
+        //m_restartButton.SetVisibleInHierarchy(false);
 
         m_leftManaElement = root.Q<Button>("LeftMana");
         m_rightManaElement = root.Q<Button>("RightMana");
@@ -91,6 +98,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         m_shootButton.RegisterCallback<MouseUpEvent>(evt => Shoot());
         m_hostButton.RegisterCallback<MouseUpEvent>(OnHostClicked, TrickleDown.TrickleDown);
         m_clientButton.RegisterCallback<MouseUpEvent>(OnClientClicked, TrickleDown.TrickleDown);
+        m_restartButton.RegisterCallback<ClickEvent>(evt => Restart());
         Debug.developerConsoleEnabled = false;
     }
 
@@ -166,13 +174,13 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     {
         if (IsObjective(beginEvent.shapeA) || IsObjective(beginEvent.shapeB))
         {
-            Debug.LogError("OBJECTIVE!!!");
             var projectile = IsObjective(beginEvent.shapeA) ? beginEvent.shapeB : beginEvent.shapeA;
             var winnerIsMe = projectile.userData.intValue == (int)PhysicsObjectType.OwnProjectile;
             var winnerManaCounter = winnerIsMe ? MyManaCounter : OtherManaCounter;
             var loserManaCounter = !winnerIsMe ? MyManaCounter : OtherManaCounter;
             winnerManaCounter.SetWinnerText("WINNER!");
             loserManaCounter.SetWinnerText("LOSER!");
+            m_restartButton.SetVisibleInHierarchy(true);
         }
 
         bool IsObjective(PhysicsShape shape)
@@ -280,10 +288,10 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         for (var i = 0; i < 1; ++i)
         {
             var body = bodies[i];
-            body.userData = new PhysicsUserData() { intValue = isMe ? (int)PhysicsObjectType.OwnProjectile : (int)PhysicsObjectType.OthersProjectile };
             body.callbackTarget = this;
             var shape =  body.CreateShape(capsuleGeometry, shapeDef);
             shape.callbackTarget = this;
+            shape.userData = new PhysicsUserData() { intValue = isMe ? (int)PhysicsObjectType.OwnProjectile : (int)PhysicsObjectType.OthersProjectile };
         }
 
         // Dispose.
@@ -301,6 +309,12 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     public string GetJoinCode()
     {
         return m_joinCodeField.value;
+    }
+
+    private void Restart()
+    {
+        SceneManager.LoadScene(0);
+        m_restartButton.SetVisibleInHierarchy(false);
     }
 
     private void SetupScene()
