@@ -1369,12 +1369,16 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 9186877601215590714, guid: 87e437132b54e57498837440a48dc22d, type: 3}
+      propertyPath: UserData.m_Int
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9186877601215590714, guid: 87e437132b54e57498837440a48dc22d, type: 3}
       propertyPath: BodyDefinition.m_Position.x
       value: -1.5
       objectReference: {fileID: 0}
     - target: {fileID: 9186877601215590714, guid: 87e437132b54e57498837440a48dc22d, type: 3}
       propertyPath: BodyDefinition.m_Position.y
-      value: -32.5
+      value: -44
       objectReference: {fileID: 0}
     - target: {fileID: 9186877601215590714, guid: 87e437132b54e57498837440a48dc22d, type: 3}
       propertyPath: BodyDefinition.m_GravityScale
@@ -2459,7 +2463,7 @@ PrefabInstance:
       objectReference: {fileID: 880298015}
     - target: {fileID: 904644473972779726, guid: 87e437132b54e57498837440a48dc22d, type: 3}
       propertyPath: m_Name
-      value: rect_06
+      value: bottomleft
       objectReference: {fileID: 0}
     - target: {fileID: 4264383452831970672, guid: 87e437132b54e57498837440a48dc22d, type: 3}
       propertyPath: m_LocalScale.x
@@ -2518,8 +2522,12 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 9186877601215590714, guid: 87e437132b54e57498837440a48dc22d, type: 3}
+      propertyPath: UserData.m_Int
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9186877601215590714, guid: 87e437132b54e57498837440a48dc22d, type: 3}
       propertyPath: BodyDefinition.m_Position.x
-      value: -12
+      value: -23
       objectReference: {fileID: 0}
     - target: {fileID: 9186877601215590714, guid: 87e437132b54e57498837440a48dc22d, type: 3}
       propertyPath: BodyDefinition.m_Position.y
@@ -2611,7 +2619,7 @@ MonoBehaviour:
     m_PhysicsMask:
       bitMask: 0
     m_Float: 0
-    m_Int: 0
+    m_Int: 1
     m_Bool: 0
   CallbackTarget: {fileID: 0}
   SceneBody: {fileID: 1164586902}

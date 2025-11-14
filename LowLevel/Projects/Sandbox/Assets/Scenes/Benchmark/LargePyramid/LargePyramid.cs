@@ -166,6 +166,7 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     {
         if (IsObjective(beginEvent.shapeA) || IsObjective(beginEvent.shapeB))
         {
+            Debug.LogError("OBJECTIVE!!!");
             var projectile = IsObjective(beginEvent.shapeA) ? beginEvent.shapeB : beginEvent.shapeA;
             var winnerIsMe = projectile.userData.intValue == (int)PhysicsObjectType.OwnProjectile;
             var winnerManaCounter = winnerIsMe ? MyManaCounter : OtherManaCounter;
@@ -251,7 +252,8 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
             //contactFilter = new PhysicsShape.ContactFilter { categories = m_ProjectileMask, contacts =  m_DestructibleMask | m_GroundMask },
             surfaceMaterial = new PhysicsShape.SurfaceMaterial { friction = 1f, bounciness = 0.3f },
             contactEvents = true,
-            density = 100f
+            density = 100f,
+            contactFilterCallbacks = true
         };
 
         // Fire all the projectiles.
