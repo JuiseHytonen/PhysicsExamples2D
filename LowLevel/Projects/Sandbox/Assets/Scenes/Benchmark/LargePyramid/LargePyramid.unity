@@ -1654,7 +1654,7 @@ PrefabInstance:
       objectReference: {fileID: 880298015}
     - target: {fileID: 904644473972779726, guid: 87e437132b54e57498837440a48dc22d, type: 3}
       propertyPath: m_Name
-      value: rect_05
+      value: mid_third
       objectReference: {fileID: 0}
     - target: {fileID: 4264383452831970672, guid: 87e437132b54e57498837440a48dc22d, type: 3}
       propertyPath: m_LocalScale.x
@@ -1770,8 +1770,9 @@ MonoBehaviour:
   Points:
   - {x: -1, y: -1}
   - {x: 1, y: -1}
-  - {x: 1, y: 1}
-  - {x: -1, y: 1}
+  - {x: 0.5, y: 1}
+  - {x: -0.5, y: 1}
+  - {x: -0.5, y: 1}
   ShapeDefinition:
     surfaceMaterial:
       m_Friction: 0.6
@@ -1806,7 +1807,7 @@ MonoBehaviour:
     m_PhysicsMask:
       bitMask: 0
     m_Float: 0
-    m_Int: 0
+    m_Int: 1
     m_Bool: 0
   CallbackTarget: {fileID: 0}
   SceneBody: {fileID: 788033880}
@@ -2619,7 +2620,7 @@ MonoBehaviour:
     m_PhysicsMask:
       bitMask: 0
     m_Float: 0
-    m_Int: 1
+    m_Int: 0
     m_Bool: 0
   CallbackTarget: {fileID: 0}
   SceneBody: {fileID: 1164586902}
