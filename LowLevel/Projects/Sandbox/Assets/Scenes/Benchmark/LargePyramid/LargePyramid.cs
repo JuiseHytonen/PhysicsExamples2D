@@ -7,6 +7,7 @@ using UnityEngine.UIElements;
 
 public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 {
+    private const int DEFAULT_SHOT_MANA_REDUCTION = 7;
     public static LargePyramid Instance;
     private Turret m_leftTurret;
     private Turret m_rightTurret;
@@ -19,10 +20,10 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
     private Button m_hostButton;
     private Button m_clientButton;
     private Button m_resetTimeButton;
-    private Button m_leftMana;
-    private Button m_rightMana;
-
-
+    private Button m_leftManaElement;
+    private Button m_rightManaElement;
+    private ManaCounter m_leftManaCounter;
+    private ManaCounter m_rightManaCounter;
 
     private bool m_leftButtonDown;
     private bool m_rightButtonDown;
@@ -38,6 +39,9 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     private Turret MyTurret => RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
     private Turret OtherTurret => !RpcTest.Instance.IsHost ? m_leftTurret : m_rightTurret;
+
+    private ManaCounter MyManaCounter => RpcTest.Instance.IsHost ? m_leftManaCounter : m_rightManaCounter;
+    private ManaCounter OtherManaCounter => !RpcTest.Instance.IsHost ? m_leftManaCounter : m_rightManaCounter;
 
     private void OnEnable()
     {
@@ -66,11 +70,10 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
         m_leftButton = root.Q<Button>("LeftButton");
         m_rightButton = root.Q<Button>("RightButton");
         m_resetTimeButton = root.Q<Button>("ResetTimeButton");
-        m_leftMana = root.Q<Button>("LeftMana");
-        m_rightMana = root.Q<Button>("RightMana");
-        m_leftMana.text = "10";
-        m_rightMana.text = "10";
-
+        m_leftManaElement = root.Q<Button>("LeftMana");
+        m_rightManaElement = root.Q<Button>("RightMana");
+        m_leftManaCounter = new ManaCounter(m_leftManaElement);
+        m_rightManaCounter = new ManaCounter(m_rightManaElement);
         m_leftButton.SetVisibleInHierarchy(false);
         m_rightButton.SetVisibleInHierarchy(false);
         m_shootButton.SetVisibleInHierarchy(false);
@@ -206,53 +209,61 @@ public class LargePyramid : MonoBehaviour,  PhysicsCallbacks.IContactCallback
 
     private void DoShoot(bool isMe, Vector2 rotation)
     {
-            m_nextShootTime = 0;
-              var capsuleRadius = 1;
-            var capsuleLength = capsuleRadius;
-            var capsuleGeometry = PolygonGeometry.CreateBox(new Vector2(1, 1));
+        m_nextShootTime = 0;
+        if (isMe)
+        {
+            MyManaCounter.ReduceMana(DEFAULT_SHOT_MANA_REDUCTION);
+        }
+        else
+        {
+            OtherManaCounter.ReduceMana(DEFAULT_SHOT_MANA_REDUCTION);
+        }
+        var capsuleRadius = 1;
+        var capsuleLength = capsuleRadius;
+        var capsuleGeometry = PolygonGeometry.CreateBox(new Vector2(1, 1));
 
-            var bodyDef = new PhysicsBodyDefinition { bodyType = RigidbodyType2D.Dynamic, gravityScale = m_GravityScale, fastCollisionsAllowed = true };
-            var shapeDef = new PhysicsShapeDefinition
-            {
-                //contactFilter = new PhysicsShape.ContactFilter { categories = m_ProjectileMask, contacts =  m_DestructibleMask | m_GroundMask },
-                surfaceMaterial = new PhysicsShape.SurfaceMaterial { friction = 1f, bounciness = 0.3f },
-                contactEvents = true,
-                density = 100f
-            };
+        var bodyDef = new PhysicsBodyDefinition { bodyType = RigidbodyType2D.Dynamic, gravityScale = m_GravityScale, fastCollisionsAllowed = true };
+        var shapeDef = new PhysicsShapeDefinition
+        {
+            //contactFilter = new PhysicsShape.ContactFilter { categories = m_ProjectileMask, contacts =  m_DestructibleMask | m_GroundMask },
+            surfaceMaterial = new PhysicsShape.SurfaceMaterial { friction = 1f, bounciness = 0.3f },
+            contactEvents = true,
+            density = 100f
+        };
 
-            // Fire all the projectiles.
-            var definitions = new NativeArray<PhysicsBodyDefinition>(1, Allocator.Temp);
-            for (var i = 0; i < 1; ++i)
-            {
-                // Calculate the fire spread.
-                var halfSpread = 1 * 0.5f;
-                var fireDirection = rotation;
-                var fireSpeed = 90f;
+        // Fire all the projectiles.
+        var definitions = new NativeArray<PhysicsBodyDefinition>(1, Allocator.Temp);
+        for (var i = 0; i < 1; ++i)
+        {
+            // Calculate the fire spread.
+            var halfSpread = 1 * 0.5f;
+            var fireDirection = rotation;
+            var fireSpeed = 90f;
 
-                // Create the projectile body.
-                bodyDef.position = isMe?MyTurret.GetPosition():OtherTurret.GetPosition();
-                bodyDef.rotation = new PhysicsRotate(2f);
-                bodyDef.linearVelocity = fireDirection * fireSpeed;
+            // Create the projectile body.
+            bodyDef.position = isMe?MyTurret.GetPosition():OtherTurret.GetPosition();
+            bodyDef.rotation = new PhysicsRotate(2f);
+            bodyDef.linearVelocity = fireDirection * fireSpeed;
 
-                definitions[i] = bodyDef;
-            }
+            definitions[i] = bodyDef;
+        }
 
-            // Create the bodies.
-            using var bodies = PhysicsWorld.defaultWorld.CreateBodyBatch(definitions);
+        // Create the bodies.
+        using var bodies = PhysicsWorld.defaultWorld.CreateBodyBatch(definitions);
 
-            // Create the capsules.
-            for (var i = 0; i < 1; ++i)
-            {
-                // Create the projectile shape.
-              //  shapeDef.surfaceMaterial.customColor = m_SandboxManager.ShapeColorState;
-                var body = bodies[i];
-                body.callbackTarget = this;
-                var shape =  body.CreateShape(capsuleGeometry, shapeDef);
-                shape.callbackTarget = this;
-            }
+        // Create the capsules.
+        for (var i = 0; i < 1; ++i)
+        {
+            // Create the projectile shape.
+          //  shapeDef.surfaceMaterial.customColor = m_SandboxManager.ShapeColorState;
+            var body = bodies[i];
+            body.callbackTarget = this;
+            var shape =  body.CreateShape(capsuleGeometry, shapeDef);
+            shape.callbackTarget = this;
+        }
 
-            // Dispose.
-            definitions.Dispose();
+        // Dispose.
+        definitions.Dispose();
     }
 
     private void OnDisable()
